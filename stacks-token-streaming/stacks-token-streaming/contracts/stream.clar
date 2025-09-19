@@ -65,3 +65,27 @@
         (ok amount)
     )
 )
+
+;; Calculate the number of blocks a stream has been active
+(define-read-only (calculate-block-delta (timeframe {
+    start-block: uint,
+    stop-block: uint,
+}))
+    (let (
+            (start-block (get start-block timeframe))
+            (stop-block (get stop-block timeframe))
+            (delta (if (<= stacks-block-height start-block)
+                ;; then
+                u0
+                ;; else
+                (if (< stacks-block-height stop-block)
+                    ;; then
+                    (- stacks-block-height start-block)
+                    ;; else
+                    (- stop-block start-block)
+                )
+            ))
+        )
+        delta
+    )
+)

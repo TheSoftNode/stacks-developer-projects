@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Header } from "@/components/Header";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Header, HeaderRef } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { AuthModal } from "@/components/AuthModal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,6 +98,15 @@ export default function WalletCheckerPage() {
     itemsPerPage: 20,
     totalItems: 0,
   });
+  const [authModal, setAuthModal] = useState<{
+    isOpen: boolean;
+    type: 'login' | 'signup';
+  }>({
+    isOpen: false,
+    type: 'login'
+  });
+  
+  const headerRef = useRef<HeaderRef>(null);
 
   // Fetch STX price on component mount
   useEffect(() => {
@@ -256,13 +266,25 @@ export default function WalletCheckerPage() {
   const filteredTransactions = getFilteredTransactions();
 
   const handleAuthClick = (type: 'login' | 'signup') => {
-    // Redirect to home page with auth modal
-    window.location.href = `/?auth=${type}`;
+    setAuthModal({ isOpen: true, type });
+  };
+
+  const handleAuthSuccess = () => {
+    // Handle successful authentication
+    console.log('Authentication successful');
+    // Refresh header auth status
+    if (headerRef.current?.refreshAuthStatus) {
+      headerRef.current.refreshAuthStatus();
+    }
+  };
+
+  const handleAuthClose = () => {
+    setAuthModal({ ...authModal, isOpen: false });
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onAuthClick={handleAuthClick} />
+      <Header ref={headerRef} onAuthClick={handleAuthClick} />
       
       <main className="pt-16 min-h-[90vh]">
         <div className="container mx-auto px-4 py-6">
@@ -767,6 +789,14 @@ export default function WalletCheckerPage() {
       </main>
 
       <Footer />
+
+      <AuthModal
+        isOpen={authModal.isOpen}
+        onClose={handleAuthClose}
+        type={authModal.type}
+        onSuccess={handleAuthSuccess}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }

@@ -41,7 +41,7 @@ export interface BalanceUpdateEmail {
       total: number;
     };
   }>;
-  updateType: 'scheduled' | 'monthly';
+  updateType: 'scheduled' | 'monthly' | 'manual';
 }
 
 export const sendBalanceUpdateEmail = async (emailData: BalanceUpdateEmail): Promise<boolean> => {

@@ -119,6 +119,12 @@ export const Header = forwardRef<HeaderRef, HeaderProps>(({ onAuthClick }, ref) 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
+              href="/wallet-checker"
+              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Wallet Explorer
+            </Link>
+            <Link
               href="#features"
               className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
             >
@@ -281,6 +287,13 @@ export const Header = forwardRef<HeaderRef, HeaderProps>(({ onAuthClick }, ref) 
                 className="md:hidden fixed top-16 left-0 right-0 bg-background/95 backdrop-blur border-b border-border shadow-lg z-40"
               >
                 <nav className="container mx-auto px-4 py-6 flex flex-col space-y-4">
+                <Link
+                  href="/wallet-checker"
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Wallet Explorer
+                </Link>
                 <Link
                   href="#features"
                   className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"

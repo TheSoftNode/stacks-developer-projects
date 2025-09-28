@@ -5,8 +5,6 @@ import { Wallet } from '../models/Wallet';
 import { BalanceHistory } from '../models/BalanceHistory';
 import { Transaction } from '../models/Transaction';
 import { sendBalanceUpdateEmail } from './email';
-import { decrypt } from './encryption';
-import { CONFIG } from './config';
 
 interface ScheduledTask {
   id: string;
@@ -56,7 +54,7 @@ class DynamicScheduler {
 
         for (const wallet of wallets) {
           try {
-            const decryptedAddress = decrypt(wallet.address);
+            const decryptedAddress = wallet.address;
             const newBalance = await this.fetchWalletBalance(decryptedAddress);
             
             if (newBalance) {
@@ -87,7 +85,7 @@ class DynamicScheduler {
               await balanceHistory.save();
 
               updatedWallets.push({
-                email: decrypt(wallet.email),
+                email: wallet.email,
                 address: decryptedAddress,
                 balance: newBalance,
                 previousBalance,

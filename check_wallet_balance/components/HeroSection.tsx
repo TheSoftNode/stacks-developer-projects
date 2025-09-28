@@ -20,7 +20,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onGetStarted }: HeroSectionProps) {
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden bg-background">
+    <section className="relative py-14 lg:py-20 overflow-hidden bg-background">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-foreground/5 bg-grid-16 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]" />
       
@@ -80,16 +80,48 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
               variant="outline"
               size="lg"
               className="border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white px-8 py-3 text-lg"
+              onClick={() => window.location.href = '/wallet-checker'}
             >
-              Watch Demo
+              Try Wallet Explorer
             </Button>
+          </motion.div>
+
+          {/* Quick Access Hint */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-12"
+          >
+            <div className="bg-gradient-to-r from-brand-teal/10 to-brand-pink/10 border border-brand-teal/20 rounded-lg p-4 max-w-2xl mx-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-sm text-center sm:text-left">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-brand-teal flex-shrink-0" />
+                  <span className="text-muted-foreground">
+                    Don't want to sign up?
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 flex-wrap justify-center sm:justify-start">
+                  <span className="text-muted-foreground">Try our</span>
+                  <button
+                    onClick={() => window.location.href = '/wallet-checker'}
+                    className="text-brand-teal font-medium hover:underline transition-colors whitespace-nowrap"
+                  >
+                    public wallet explorer
+                  </button>
+                  <span className="text-muted-foreground">
+                    to check any Stacks address instantly.
+                  </span>
+                </div>
+              </div>
+            </div>
           </motion.div>
 
           {/* Feature highlights */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto"
           >
             <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
@@ -111,7 +143,7 @@ export function HeroSection({ onGetStarted }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-20 max-w-6xl mx-auto"
         >
           <FeatureCard

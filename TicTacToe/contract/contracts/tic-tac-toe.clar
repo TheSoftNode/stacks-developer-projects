@@ -14,9 +14,8 @@
 (define-constant ERR_GAME_TIMEOUT u105)
 (define-constant ERR_GAME_FINISHED u106)
 (define-constant ERR_NOT_ABANDONED u107)
-
-;; Timeout configuration (24 hours = 144 blocks at 10min/block)
-(define-constant MOVE_TIMEOUT_BLOCKS u144)
+(define-constant ERR_PLATFORM_PAUSED u108)
+(define-constant ERR_INVALID_BET_AMOUNT u109)
 
 ;; data vars
 ;; The Game ID to use for the next game
@@ -39,12 +38,16 @@
 )
 
 ;; private functions
-;; Check if a game has timed out (no move for MOVE_TIMEOUT_BLOCKS)
+;; Check if a game has timed out (no move for configured timeout blocks)
 (define-private (is-game-timed-out (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20)}))
+    (let (
+        (timeout-blocks (contract-call? .platform-manager get-move-timeout))
+    )
     (and 
         (is-eq (get status game-data) "active")
-        (> (- stacks-block-height (get last-move-block game-data)) MOVE_TIMEOUT_BLOCKS)
+        (> (- stacks-block-height (get last-move-block game-data)) timeout-blocks)
         (is-some (get player-two game-data)) ;; Game must have both players
+    )
     )
 )
 
@@ -100,6 +103,23 @@
     )
 )
 
+;; Check if the board is full (all cells occupied)
+(define-private (is-board-full (board (list 9 uint)))
+    (is-eq (len (filter is-cell-empty board)) u0)
+)
+
+(define-private (is-cell-empty (cell uint))
+    (is-eq cell u0)
+)
+
+;; Check if the game is a draw (board full and no winner)
+(define-private (is-draw (board (list 9 uint)))
+    (and 
+        (is-board-full board)
+        (not (has-won board))
+    )
+)
+
 ;; public functions
 ;; Create a new game with a bet amount and initial move
 (define-public (create-game (bet-amount uint) (move-index uint) (move uint))
@@ -123,8 +143,10 @@
             status: "active"
         })
     )
-    ;; Ensure that user has put up a bet amount greater than the minimum
-    (asserts! (> bet-amount u0) (err ERR_MIN_BET_AMOUNT))
+    ;; Check if platform is paused
+    (asserts! (not (contract-call? .platform-manager is-paused)) (err ERR_PLATFORM_PAUSED))
+    ;; Ensure that user has put up a bet amount greater than the minimum from platform manager
+    (asserts! (>= bet-amount (contract-call? .platform-manager get-min-bet-amount)) (err ERR_INVALID_BET_AMOUNT))
     ;; Ensure that the move being played is an `X`, not an `O`
     (asserts! (is-eq move u1) (err ERR_INVALID_MOVE))
     ;; Ensure that the move meets validity requirements
@@ -160,6 +182,8 @@
             last-move-block: stacks-block-height
         }))
     )
+    ;; Check if platform is paused
+    (asserts! (not (contract-call? .platform-manager is-paused)) (err ERR_PLATFORM_PAUSED))
     ;; Ensure that the game being joined is able to be joined
     ;; i.e. player-two is currently empty
     (asserts! (is-none (get player-two original-game-data)) (err ERR_GAME_CANNOT_BE_JOINED))
@@ -180,6 +204,7 @@
 ))
 
 ;; Make a move in an existing game
+;; #[allow(unchecked_data)]
 (define-public (play (game-id uint) (move-index uint) (move uint))
     (let (
         ;; Load the game data for the game being joined, throw an error if Game ID is invalid
@@ -196,6 +221,10 @@
         (game-board (unwrap! (replace-at? original-board move-index move) (err ERR_INVALID_MOVE)))
         ;; Check if the game has been won now with this modified board
         (is-now-winner (has-won game-board))
+        ;; Check if the game is a draw
+        (is-now-draw (is-draw game-board))
+        ;; Determine game status
+        (new-status (if (or is-now-winner is-now-draw) "finished" "active"))
         ;; Merge the game data with the updated board and marking the next turn to be player two's turn
         ;; Also mark the winner if the game has been won
         (game-data (merge original-game-data {
@@ -203,9 +232,11 @@
             is-player-one-turn: (not is-player-one-turn),
             winner: (if is-now-winner (some player-turn) none),
             last-move-block: stacks-block-height,
-            status: (if is-now-winner "finished" "active")
+            status: new-status
         }))
     )
+    ;; Check if platform is paused
+    (asserts! (not (contract-call? .platform-manager is-paused)) (err ERR_PLATFORM_PAUSED))
     ;; Ensure that the game is still active and can be played
     (asserts! (is-game-active original-game-data) (err ERR_GAME_FINISHED))
     ;; Ensure that the function is being called by the player whose turn it is
@@ -215,8 +246,29 @@
     ;; Ensure that the move meets validity requirements
     (asserts! (validate-move original-board move-index move) (err ERR_INVALID_MOVE))
 
-    ;; if the game has been won, transfer the (bet amount * 2 = both players bets) STX to the winner
-    (if is-now-winner (try! (as-contract (stx-transfer? (* u2 (get bet-amount game-data)) tx-sender player-turn))) false)
+    ;; Handle prize distribution and player statistics
+    (if is-now-winner 
+        (let (
+            (winner player-turn)
+            (loser (if is-player-one-turn (unwrap-panic (get player-two original-game-data)) (get player-one original-game-data)))
+            (prize-amount (* u2 (get bet-amount game-data)))
+        )
+        ;; Winner gets both bets
+        (try! (as-contract (stx-transfer? prize-amount tx-sender winner)))
+        ;; Record game result in player registry
+        (try! (contract-call? .player-registry record-game-result winner loser prize-amount (get bet-amount game-data)))
+        )
+        ;; If it's a draw, return bet to both players
+        (if is-now-draw
+            (begin
+                (try! (as-contract (stx-transfer? (get bet-amount game-data) tx-sender (get player-one original-game-data))))
+                (try! (as-contract (stx-transfer? (get bet-amount game-data) tx-sender (unwrap-panic (get player-two original-game-data)))))
+                ;; Record draw result in player registry
+                (try! (contract-call? .player-registry record-draw-result (get player-one original-game-data) (unwrap-panic (get player-two original-game-data))))
+            )
+            false
+        )
+    )
 
     ;; Update the games map with the new game data
     (map-set games game-id game-data)

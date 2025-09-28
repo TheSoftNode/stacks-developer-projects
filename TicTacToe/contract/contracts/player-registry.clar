@@ -28,8 +28,33 @@
         elo-rating: uint,
         tournaments-won: uint,
         tournaments-played: uint,
+        series-played: uint,
+        series-won: uint,
+        current-streak: uint,
+        best-streak: uint,
+        average-game-duration: uint, ;; in blocks
         joined-at: uint,
         last-active: uint
+    }
+)
+
+;; Enhanced tracking maps
+(define-map player-monthly-stats
+    { player: principal, month: uint, year: uint }
+    {
+        games-played: uint,
+        games-won: uint,
+        winnings: uint,
+        tournaments-played: uint
+    }
+)
+
+(define-map player-achievements
+    { player: principal, achievement-id: uint }
+    {
+        earned-at: uint,
+        achievement-type: (string-ascii 50),
+        achievement-data: uint
     }
 )
 
@@ -49,6 +74,11 @@
         elo-rating: INITIAL_ELO,
         tournaments-won: u0,
         tournaments-played: u0,
+        series-played: u0,
+        series-won: u0,
+        current-streak: u0,
+        best-streak: u0,
+        average-game-duration: u0,
         joined-at: stacks-block-height,
         last-active: stacks-block-height
     })
@@ -112,6 +142,7 @@
             games-played: u0, games-won: u0, games-lost: u0, games-drawn: u0,
             total-winnings: u0, total-losses: u0, elo-rating: INITIAL_ELO,
             tournaments-won: u0, tournaments-played: u0,
+            series-played: u0, series-won: u0, current-streak: u0, best-streak: u0, average-game-duration: u0,
             joined-at: stacks-block-height, last-active: stacks-block-height
         } (map-get? players player)))
     )
@@ -132,6 +163,7 @@
             games-played: u0, games-won: u0, games-lost: u0, games-drawn: u0,
             total-winnings: u0, total-losses: u0, elo-rating: INITIAL_ELO,
             tournaments-won: u0, tournaments-played: u0,
+            series-played: u0, series-won: u0, current-streak: u0, best-streak: u0, average-game-duration: u0,
             joined-at: stacks-block-height, last-active: stacks-block-height
         } (map-get? players player)))
     )
@@ -221,6 +253,11 @@
             elo-rating: INITIAL_ELO,
             tournaments-won: u0,
             tournaments-played: u0,
+            series-played: u0,
+            series-won: u0,
+            current-streak: u0,
+            best-streak: u0,
+            average-game-duration: u0,
             joined-at: stacks-block-height,
             last-active: stacks-block-height
         }
@@ -286,6 +323,41 @@
     )
 )
 
+;; Series statistics functions
+;; #[allow(unchecked_data)]
+(define-public (record-series-participation (player principal))
+    (let (
+        (player-stats (get-or-create-player player))
+    )
+    ;; Only authorized contracts can record series participation
+    (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
+    
+    ;; Update series participation count
+    (map-set players player (merge player-stats {
+        series-played: (+ (get series-played player-stats) u1),
+        last-active: stacks-block-height
+    }))
+    (ok true)
+    )
+)
+
+;; #[allow(unchecked_data)]
+(define-public (record-series-win (winner principal))
+    (let (
+        (winner-stats (get-or-create-player winner))
+    )
+    ;; Only authorized contracts can record series wins
+    (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
+    
+    ;; Update series win count
+    (map-set players winner (merge winner-stats {
+        series-won: (+ (get series-won winner-stats) u1),
+        last-active: stacks-block-height
+    }))
+    (ok true)
+    )
+)
+
 ;; Get tournament-specific statistics
 (define-read-only (get-tournament-stats (player principal))
     (match (map-get? players player)
@@ -294,6 +366,21 @@
             tournaments-won: (get tournaments-won player-stats),
             tournament-win-rate: (if (> (get tournaments-played player-stats) u0)
                 (/ (* (get tournaments-won player-stats) u10000) (get tournaments-played player-stats))
+                u0
+            )
+        })
+        (err ERR_PLAYER_NOT_FOUND)
+    )
+)
+
+;; Get series-specific statistics
+(define-read-only (get-series-stats (player principal))
+    (match (map-get? players player)
+        player-stats (ok {
+            series-played: (get series-played player-stats),
+            series-won: (get series-won player-stats),
+            series-win-rate: (if (> (get series-played player-stats) u0)
+                (/ (* (get series-won player-stats) u10000) (get series-played player-stats))
                 u0
             )
         })

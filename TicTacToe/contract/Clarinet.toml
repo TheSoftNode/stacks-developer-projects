@@ -5,6 +5,16 @@ authors = []
 telemetry = true
 cache_dir = './.cache'
 requirements = []
+[contracts.game-series]
+path = 'contracts/game-series.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.game-variants]
+path = 'contracts/game-variants.clar'
+clarity_version = 3
+epoch = 3.1
+
 [contracts.platform-manager]
 path = 'contracts/platform-manager.clar'
 clarity_version = 3
@@ -12,6 +22,11 @@ epoch = 3.1
 
 [contracts.player-registry]
 path = 'contracts/player-registry.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.staking-system]
+path = 'contracts/staking-system.clar'
 clarity_version = 3
 epoch = 3.1
 

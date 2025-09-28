@@ -33,13 +33,16 @@
         winner: (optional principal),
         last-move-block: uint,
         created-at-block: uint,
-        status: (string-ascii 20) ;; "active", "finished", "abandoned"
+        status: (string-ascii 20), ;; "active", "finished", "abandoned"
+        tournament-id: (optional uint), ;; Tournament context
+        tournament-round: (optional uint), ;; Tournament round
+        tournament-position: (optional uint) ;; Position in tournament bracket
     }
 )
 
 ;; private functions
 ;; Check if a game has timed out (no move for configured timeout blocks)
-(define-private (is-game-timed-out (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20)}))
+(define-private (is-game-timed-out (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20), tournament-id: (optional uint), tournament-round: (optional uint), tournament-position: (optional uint)}))
     (let (
         (timeout-blocks (contract-call? .platform-manager get-move-timeout))
     )
@@ -52,7 +55,7 @@
 )
 
 ;; Check if a game is active and can be played
-(define-private (is-game-active (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20)}))
+(define-private (is-game-active (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20), tournament-id: (optional uint), tournament-round: (optional uint), tournament-position: (optional uint)}))
     (and
         (is-eq (get status game-data) "active")
         (is-none (get winner game-data))
@@ -140,7 +143,10 @@
             winner: none,
             last-move-block: stacks-block-height,
             created-at-block: stacks-block-height,
-            status: "active"
+            status: "active",
+            tournament-id: none,
+            tournament-round: none,
+            tournament-position: none
         })
     )
     ;; Check if platform is paused
@@ -164,6 +170,47 @@
     ;; Return the Game ID of the new game
     (ok game-id)
 ))
+
+;; Create a tournament game between two specific players
+;; #[allow(unchecked_data)]
+(define-public (create-tournament-game (player-one principal) (player-two principal) (bet-amount uint) (tournament-id uint) (round uint) (position uint))
+    (let (
+        ;; Get the Game ID to use for creation of this new game
+        (game-id (var-get latest-game-id))
+        ;; Empty board for tournament games
+        (starting-board (list u0 u0 u0 u0 u0 u0 u0 u0 u0))
+        ;; Create the tournament game data
+        (game-data {
+            player-one: player-one,
+            player-two: (some player-two),
+            is-player-one-turn: true,
+            bet-amount: bet-amount,
+            board: starting-board,
+            winner: none,
+            last-move-block: stacks-block-height,
+            created-at-block: stacks-block-height,
+            status: "active",
+            tournament-id: (some tournament-id),
+            tournament-round: (some round),
+            tournament-position: (some position)
+        })
+    )
+    ;; Check if platform is paused
+    (asserts! (not (contract-call? .platform-manager is-paused)) (err ERR_PLATFORM_PAUSED))
+    ;; Only tournament manager can create tournament games
+    (asserts! (is-eq contract-caller .tournament-manager) (err ERR_NOT_YOUR_TURN))
+    
+    ;; Update the games map with the new game data
+    (map-set games game-id game-data)
+    ;; Increment the Game ID counter
+    (var-set latest-game-id (+ game-id u1))
+
+    ;; Log the creation of the tournament game
+    (print { action: "create-tournament-game", game-id: game-id, tournament-id: tournament-id, round: round })
+    ;; Return the Game ID of the new game
+    (ok game-id)
+    )
+)
 
 ;; Join an existing game as player two
 (define-public (join-game (game-id uint) (move-index uint) (move uint))
@@ -272,12 +319,41 @@
 
     ;; Update the games map with the new game data
     (map-set games game-id game-data)
+    
+    ;; Handle tournament game completion if applicable
+    (try! (handle-tournament-game-completion game-id game-data))
 
     ;; Log the action of a move being made
     (print {action: "play", data: game-data})
     ;; Return the Game ID of the game
     (ok game-id)
 ))
+
+;; Function to handle tournament game completion
+(define-private (handle-tournament-game-completion (game-id uint) (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20), tournament-id: (optional uint), tournament-round: (optional uint), tournament-position: (optional uint)}))
+    (match (get tournament-id game-data)
+        tournament-id-val (match (get tournament-round game-data)
+            round-val (match (get tournament-position game-data)
+                position-val (match (get winner game-data)
+                    winner-val (begin
+                        ;; Notify tournament manager of the result
+                        (try! (contract-call? .tournament-manager record-match-result 
+                            tournament-id-val 
+                            round-val 
+                            position-val 
+                            winner-val 
+                            game-id))
+                        (ok true)
+                    )
+                    (ok true) ;; No winner yet
+                )
+                (ok true) ;; No position
+            )
+            (ok true) ;; No round
+        )
+        (ok true) ;; Not a tournament game
+    )
+)
 
 ;; Claim an abandoned game and recover funds
 (define-public (claim-abandoned-game (game-id uint))

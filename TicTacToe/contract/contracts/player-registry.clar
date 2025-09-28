@@ -206,6 +206,101 @@
     )
 )
 
+;; Helper function to get or create player stats
+(define-private (get-or-create-player (player principal))
+    (match (map-get? players player)
+        existing-stats existing-stats
+        ;; If player doesn't exist, create with default stats
+        {
+            games-played: u0,
+            games-won: u0,
+            games-lost: u0,
+            games-drawn: u0,
+            total-winnings: u0,
+            total-losses: u0,
+            elo-rating: INITIAL_ELO,
+            tournaments-won: u0,
+            tournaments-played: u0,
+            joined-at: stacks-block-height,
+            last-active: stacks-block-height
+        }
+    )
+)
+
+;; Tournament statistics functions
+;; #[allow(unchecked_data)]
+(define-public (record-tournament-participation (player principal))
+    (let (
+        (player-stats (get-or-create-player player))
+    )
+    ;; Only authorized contracts (tournament-manager) can record tournament participation
+    (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
+    
+    ;; Update tournament participation count
+    (map-set players player (merge player-stats {
+        tournaments-played: (+ (get tournaments-played player-stats) u1),
+        last-active: stacks-block-height
+    }))
+    (ok true)
+    )
+)
+
+;; #[allow(unchecked_data)]
+(define-public (record-tournament-win (winner principal))
+    (let (
+        (winner-stats (get-or-create-player winner))
+    )
+    ;; Only authorized contracts (tournament-manager) can record tournament wins
+    (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
+    
+    ;; Update tournament win count
+    (map-set players winner (merge winner-stats {
+        tournaments-won: (+ (get tournaments-won winner-stats) u1),
+        last-active: stacks-block-height
+    }))
+    (ok true)
+    )
+)
+
+;; Record multiple tournament participants at once
+;; #[allow(unchecked_data)]
+(define-public (record-tournament-participants (participants (list 32 principal)))
+    (begin
+    ;; Only authorized contracts can record tournament participation
+    (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
+    
+    ;; Update each participant's tournament count
+    (fold record-single-participant participants (ok u0))
+    )
+)
+
+(define-private (record-single-participant (player principal) (previous-result (response uint uint)))
+    (let (
+        (player-stats (get-or-create-player player))
+    )
+    (map-set players player (merge player-stats {
+        tournaments-played: (+ (get tournaments-played player-stats) u1),
+        last-active: stacks-block-height
+    }))
+    (ok u0)
+    )
+)
+
+;; Get tournament-specific statistics
+(define-read-only (get-tournament-stats (player principal))
+    (match (map-get? players player)
+        player-stats (ok {
+            tournaments-played: (get tournaments-played player-stats),
+            tournaments-won: (get tournaments-won player-stats),
+            tournament-win-rate: (if (> (get tournaments-played player-stats) u0)
+                (/ (* (get tournaments-won player-stats) u10000) (get tournaments-played player-stats))
+                u0
+            )
+        })
+        (err ERR_PLAYER_NOT_FOUND)
+    )
+)
+
 ;; read only functions
 (define-read-only (get-player-stats (player principal))
     (map-get? players player)

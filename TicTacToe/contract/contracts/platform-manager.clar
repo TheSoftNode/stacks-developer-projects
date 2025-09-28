@@ -147,6 +147,7 @@
 
 
 
-;; Initialize the game engine as authorized contract
+;; Initialize authorized contracts
 (map-set authorized-contracts .tic-tac-toe true)
+(map-set authorized-contracts .tournament-manager true)
 

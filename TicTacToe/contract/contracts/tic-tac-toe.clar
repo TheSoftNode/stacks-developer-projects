@@ -11,6 +11,12 @@
 (define-constant ERR_GAME_NOT_FOUND u102)
 (define-constant ERR_GAME_CANNOT_BE_JOINED u103)
 (define-constant ERR_NOT_YOUR_TURN u104)
+(define-constant ERR_GAME_TIMEOUT u105)
+(define-constant ERR_GAME_FINISHED u106)
+(define-constant ERR_NOT_ABANDONED u107)
+
+;; Timeout configuration (24 hours = 144 blocks at 10min/block)
+(define-constant MOVE_TIMEOUT_BLOCKS u144)
 
 ;; data vars
 ;; The Game ID to use for the next game
@@ -25,11 +31,31 @@
         is-player-one-turn: bool,
         bet-amount: uint,
         board: (list 9 uint),
-        winner: (optional principal)
+        winner: (optional principal),
+        last-move-block: uint,
+        created-at-block: uint,
+        status: (string-ascii 20) ;; "active", "finished", "abandoned"
     }
 )
 
 ;; private functions
+;; Check if a game has timed out (no move for MOVE_TIMEOUT_BLOCKS)
+(define-private (is-game-timed-out (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20)}))
+    (and 
+        (is-eq (get status game-data) "active")
+        (> (- stacks-block-height (get last-move-block game-data)) MOVE_TIMEOUT_BLOCKS)
+        (is-some (get player-two game-data)) ;; Game must have both players
+    )
+)
+
+;; Check if a game is active and can be played
+(define-private (is-game-active (game-data {player-one: principal, player-two: (optional principal), is-player-one-turn: bool, bet-amount: uint, board: (list 9 uint), winner: (optional principal), last-move-block: uint, created-at-block: uint, status: (string-ascii 20)}))
+    (and
+        (is-eq (get status game-data) "active")
+        (is-none (get winner game-data))
+        (is-some (get player-two game-data))
+    )
+)
 ;; Validate that a move is valid (within bounds, X or O, and on an empty spot)
 (define-private (validate-move (board (list 9 uint)) (move-index uint) (move uint))
     (let (
@@ -91,7 +117,10 @@
             is-player-one-turn: false,
             bet-amount: bet-amount,
             board: game-board,
-            winner: none
+            winner: none,
+            last-move-block: stacks-block-height,
+            created-at-block: stacks-block-height,
+            status: "active"
         })
     )
     ;; Ensure that user has put up a bet amount greater than the minimum
@@ -127,7 +156,8 @@
         (game-data (merge original-game-data {
             board: game-board,
             player-two: (some contract-caller),
-            is-player-one-turn: true
+            is-player-one-turn: true,
+            last-move-block: stacks-block-height
         }))
     )
     ;; Ensure that the game being joined is able to be joined
@@ -171,9 +201,13 @@
         (game-data (merge original-game-data {
             board: game-board,
             is-player-one-turn: (not is-player-one-turn),
-            winner: (if is-now-winner (some player-turn) none)
+            winner: (if is-now-winner (some player-turn) none),
+            last-move-block: stacks-block-height,
+            status: (if is-now-winner "finished" "active")
         }))
     )
+    ;; Ensure that the game is still active and can be played
+    (asserts! (is-game-active original-game-data) (err ERR_GAME_FINISHED))
     ;; Ensure that the function is being called by the player whose turn it is
     (asserts! (is-eq player-turn contract-caller) (err ERR_NOT_YOUR_TURN))
     ;; Ensure that the move being played is the correct move based on the current turn (X or O)
@@ -190,6 +224,38 @@
     ;; Log the action of a move being made
     (print {action: "play", data: game-data})
     ;; Return the Game ID of the game
+    (ok game-id)
+))
+
+;; Claim an abandoned game and recover funds
+(define-public (claim-abandoned-game (game-id uint))
+    (let (
+        ;; Load the game data
+        (game-data (unwrap! (map-get? games game-id) (err ERR_GAME_NOT_FOUND)))
+        ;; Calculate total prize amount (both players' bets)
+        (total-prize (* u2 (get bet-amount game-data)))
+        ;; Updated game data marking it as abandoned
+        (updated-game-data (merge game-data {
+            status: "abandoned",
+            winner: (some contract-caller)
+        }))
+    )
+    ;; Ensure the game has timed out
+    (asserts! (is-game-timed-out game-data) (err ERR_NOT_ABANDONED))
+    ;; Ensure the claimer is one of the players
+    (asserts! (or 
+        (is-eq contract-caller (get player-one game-data))
+        (is-eq contract-caller (unwrap! (get player-two game-data) (err ERR_GAME_NOT_FOUND)))
+    ) (err ERR_NOT_YOUR_TURN))
+
+    ;; Transfer the total prize to the claiming player
+    (try! (as-contract (stx-transfer? total-prize tx-sender contract-caller)))
+    ;; Update the games map with the abandoned status
+    (map-set games game-id updated-game-data)
+
+    ;; Log the game abandonment claim
+    (print { action: "claim-abandoned-game", game-id: game-id, claimer: contract-caller, amount: total-prize })
+    ;; Return success
     (ok game-id)
 ))
 

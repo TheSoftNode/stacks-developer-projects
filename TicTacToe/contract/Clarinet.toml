@@ -5,6 +5,16 @@ authors = []
 telemetry = true
 cache_dir = './.cache'
 requirements = []
+[contracts.platform-manager]
+path = 'contracts/platform-manager.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.player-registry]
+path = 'contracts/player-registry.clar'
+clarity_version = 3
+epoch = 3.1
+
 [contracts.tic-tac-toe]
 path = 'contracts/tic-tac-toe.clar'
 clarity_version = 3
@@ -14,8 +24,8 @@ passes = ['check_checker']
 
 [repl.analysis.check_checker]
 strict = false
-trusted_sender = false
-trusted_caller = false
+trusted_sender = true
+trusted_caller = true
 callee_filter = false
 
 [repl.remote_data]

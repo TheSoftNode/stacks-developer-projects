@@ -125,22 +125,10 @@ export const Header = forwardRef<HeaderRef, HeaderProps>(({ onAuthClick }, ref) 
               Wallet Explorer
             </Link>
             <Link
-              href="#features"
+              href="/docs"
               className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
             >
-              Features
-            </Link>
-            <Link
-              href="#security"
-              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Security
-            </Link>
-            <Link
-              href="#pricing"
-              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Pricing
+              Documentation
             </Link>
           </nav>
 
@@ -295,25 +283,11 @@ export const Header = forwardRef<HeaderRef, HeaderProps>(({ onAuthClick }, ref) 
                   Wallet Explorer
                 </Link>
                 <Link
-                  href="#features"
+                  href="/docs"
                   className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Features
-                </Link>
-                <Link
-                  href="#security"
-                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Security
-                </Link>
-                <Link
-                  href="#pricing"
-                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Pricing
+                  Documentation
                 </Link>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-border">

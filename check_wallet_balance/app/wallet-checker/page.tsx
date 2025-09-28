@@ -653,17 +653,30 @@ export default function WalletCheckerPage() {
                                         )}
                                       </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="group">
                                       <div className="space-y-1">
                                         <div className="text-sm">
                                           <span className="text-muted-foreground">
                                             {tx.type === 'received' ? 'From: ' : 'To: '}
                                           </span>
-                                          <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                            {formatAddress(
-                                              tx.type === 'received' ? tx.fromAddress : tx.toAddress
-                                            )}
-                                          </code>
+                                          <div className="inline-flex items-center space-x-2">
+                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                                              {formatAddress(
+                                                tx.type === 'received' ? tx.fromAddress : tx.toAddress
+                                              )}
+                                            </code>
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                                              onClick={() => copyToClipboard(
+                                                tx.type === 'received' ? tx.fromAddress : tx.toAddress,
+                                                'Address'
+                                              )}
+                                            >
+                                              <Copy className="h-2.5 w-2.5" />
+                                            </Button>
+                                          </div>
                                         </div>
                                         {tx.fee > 0 && (
                                           <div className="text-xs text-muted-foreground">

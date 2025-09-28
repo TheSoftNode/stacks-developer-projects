@@ -84,4 +84,14 @@ plan:
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/game-series.clar
             clarity-version: 3
+        - emulated-contract-publish:
+            contract-name: game-variants
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/game-variants.clar
+            clarity-version: 3
+        - emulated-contract-publish:
+            contract-name: staking-system
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/staking-system.clar
+            clarity-version: 3
       epoch: "3.1"

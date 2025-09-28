@@ -181,6 +181,8 @@
             games-played: u0, games-won: u0, games-lost: u0, games-drawn: u0,
             total-winnings: u0, total-losses: u0, elo-rating: INITIAL_ELO,
             tournaments-won: u0, tournaments-played: u0,
+            series-played: u0, series-won: u0,
+            current-streak: u0, best-streak: u0, average-game-duration: u0,
             joined-at: stacks-block-height, last-active: stacks-block-height
         } (map-get? players winner)))
     )
@@ -198,6 +200,8 @@
             games-played: u0, games-won: u0, games-lost: u0, games-drawn: u0,
             total-winnings: u0, total-losses: u0, elo-rating: INITIAL_ELO,
             tournaments-won: u0, tournaments-played: u0,
+            series-played: u0, series-won: u0,
+            current-streak: u0, best-streak: u0, average-game-duration: u0,
             joined-at: stacks-block-height, last-active: stacks-block-height
         } (map-get? players participant)))
     )

@@ -128,40 +128,16 @@
         (var-set platform-treasury (+ (var-get platform-treasury) amount))
         (var-set total-fees-collected (+ (var-get total-fees-collected) amount))
         
-        ;; Automatically distribute funds based on allocation percentages
-        (try! (distribute-treasury-funds amount))
+        ;; Note: Automatic distribution disabled to avoid circular dependency
+        ;; (try! (distribute-treasury-funds amount))
         
         (print { action: "collect-platform-fee", amount: amount, new-treasury: (var-get platform-treasury) })
         (ok true)
     )
 )
 
-;; Distribute treasury funds to different pools
-(define-private (distribute-treasury-funds (amount uint))
-    (let (
-        (staking-allocation (var-get staking-rewards-allocation))
-        (development-allocation (var-get development-fund-allocation))
-        (marketing-allocation (var-get marketing-fund-allocation))
-        (staking-amount (/ (* amount staking-allocation) u10000))
-        (development-amount (/ (* amount development-allocation) u10000))
-        (marketing-amount (/ (* amount marketing-allocation) u10000))
-    )
-    ;; Transfer to staking rewards pool
-    (if (> staking-amount u0)
-        (try! (contract-call? .staking-system add-to-reward-pool staking-amount))
-        (ok true)
-    )
-    
-    ;; Log distribution
-    (print { 
-        action: "distribute-treasury-funds", 
-        staking: staking-amount, 
-        development: development-amount, 
-        marketing: marketing-amount 
-    })
-    (ok true)
-    )
-)
+;; Note: Distribution functions removed to avoid circular dependencies
+;; These can be added later after deployment
 
 ;; Withdraw funds from treasury (admin only)
 ;; #[allow(unchecked_data)]
@@ -195,6 +171,25 @@
         (ok true)
     )
 )
+
+;; Manual function to distribute accumulated funds to staking system
+;; Note: Commented out to avoid circular dependency during compilation
+;; This function can be added later after all contracts are deployed
+;; #[allow(unchecked_data)]
+;; (define-public (distribute-to-staking (amount uint))
+;;     (begin
+;;         (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
+;;         (asserts! (<= amount (var-get platform-treasury)) (err ERR_INVALID_CONFIG))
+;;         
+;;         ;; Transfer to staking system
+;;         (try! (contract-call? .staking-system add-to-reward-pool amount))
+;;         ;; Update treasury
+;;         (var-set platform-treasury (- (var-get platform-treasury) amount))
+;;         
+;;         (print { action: "distribute-to-staking", amount: amount })
+;;         (ok true)
+;;     )
+;; )
 
 ;; read only functions
 (define-read-only (is-paused)

@@ -136,8 +136,25 @@
     )
 )
 
-;; Note: Distribution functions removed to avoid circular dependencies
-;; These can be added later after deployment
+;; Manual function to distribute accumulated funds to staking system
+;; This breaks the circular dependency by using direct STX transfer
+;; The staking contract has a receive function to accept these funds
+;; #[allow(unchecked_data)]
+(define-public (distribute-to-staking (amount uint))
+    (begin
+        (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
+        (asserts! (<= amount (var-get platform-treasury)) (err ERR_INVALID_CONFIG))
+
+        ;; Transfer STX directly to staking contract address
+        ;; Staking contract will accept and add to reward pool
+        (try! (as-contract (stx-transfer? amount tx-sender .staking-system)))
+        ;; Update treasury
+        (var-set platform-treasury (- (var-get platform-treasury) amount))
+
+        (print { action: "distribute-to-staking", amount: amount, new-treasury: (var-get platform-treasury) })
+        (ok true)
+    )
+)
 
 ;; Withdraw funds from treasury (admin only)
 ;; #[allow(unchecked_data)]
@@ -171,25 +188,6 @@
         (ok true)
     )
 )
-
-;; Manual function to distribute accumulated funds to staking system
-;; Note: Commented out to avoid circular dependency during compilation
-;; This function can be added later after all contracts are deployed
-;; #[allow(unchecked_data)]
-;; (define-public (distribute-to-staking (amount uint))
-;;     (begin
-;;         (asserts! (is-admin contract-caller) (err ERR_UNAUTHORIZED))
-;;         (asserts! (<= amount (var-get platform-treasury)) (err ERR_INVALID_CONFIG))
-;;         
-;;         ;; Transfer to staking system
-;;         (try! (contract-call? .staking-system add-to-reward-pool amount))
-;;         ;; Update treasury
-;;         (var-set platform-treasury (- (var-get platform-treasury) amount))
-;;         
-;;         (print { action: "distribute-to-staking", amount: amount })
-;;         (ok true)
-;;     )
-;; )
 
 ;; read only functions
 (define-read-only (is-paused)

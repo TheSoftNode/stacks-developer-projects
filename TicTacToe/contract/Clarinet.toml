@@ -1,44 +1,67 @@
 [project]
 name = 'contract'
-description = ''
+description = 'TicTacToe Gaming Platform - Multiplayer blockchain gaming with tournaments and staking'
 authors = []
 telemetry = true
 cache_dir = './.cache'
 requirements = []
+
+# Deployment Order (Critical for avoiding circular dependencies):
+# 1. traits - Interface definitions
+# 2. platform-manager - Core authorization and configuration
+# 3. player-registry - Player statistics (depends on platform-manager)
+# 4. tic-tac-toe - Main game contract (depends on platform-manager, player-registry)
+# 5. staking-system - Staking rewards (depends on platform-manager, player-registry)
+# 6. game-variants - Board variants (depends on platform-manager, player-registry)
+# 7. game-series - Game series (depends on platform-manager, player-registry, tic-tac-toe)
+# 8. tournament-manager - Tournaments (depends on platform-manager, player-registry, tic-tac-toe)
+
+[contracts.traits]
+path = 'contracts/traits.clar'
+clarity_version = 3
+epoch = 3.1
+
 [contracts.platform-manager]
 path = 'contracts/platform-manager.clar'
 clarity_version = 3
 epoch = 3.1
+depends_on = []
 
 [contracts.player-registry]
 path = 'contracts/player-registry.clar'
 clarity_version = 3
 epoch = 3.1
-
-[contracts.tournament-manager]
-path = 'contracts/tournament-manager.clar'
-clarity_version = 3
-epoch = 3.1
-
-[contracts.staking-system]
-path = 'contracts/staking-system.clar'
-clarity_version = 3
-epoch = 3.1
+depends_on = ['platform-manager']
 
 [contracts.tic-tac-toe]
 path = 'contracts/tic-tac-toe.clar'
 clarity_version = 3
 epoch = 3.1
+depends_on = ['platform-manager', 'player-registry']
+
+[contracts.staking-system]
+path = 'contracts/staking-system.clar'
+clarity_version = 3
+epoch = 3.1
+depends_on = ['platform-manager', 'player-registry']
 
 [contracts.game-variants]
 path = 'contracts/game-variants.clar'
 clarity_version = 3
 epoch = 3.1
+depends_on = ['platform-manager', 'player-registry']
 
 [contracts.game-series]
 path = 'contracts/game-series.clar'
 clarity_version = 3
 epoch = 3.1
+depends_on = ['platform-manager', 'player-registry', 'tic-tac-toe']
+
+[contracts.tournament-manager]
+path = 'contracts/tournament-manager.clar'
+clarity_version = 3
+epoch = 3.1
+depends_on = ['platform-manager', 'player-registry', 'tic-tac-toe']
 [repl.analysis]
 passes = ['check_checker']
 

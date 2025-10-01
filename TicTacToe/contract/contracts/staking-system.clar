@@ -210,13 +210,40 @@
     (begin
     ;; Only authorized contracts can add to reward pool
     (asserts! (contract-call? .platform-manager is-authorized-contract contract-caller) (err ERR_UNAUTHORIZED))
-    
+
     ;; Add to reward pool
     (var-set reward-pool (+ (var-get reward-pool) amount))
-    
+
     ;; Log action
     (print { action: "add-to-reward-pool", amount: amount, new-total: (var-get reward-pool) })
     (ok true)
+    )
+)
+
+;; Receive platform fees from platform-manager
+;; This function allows platform-manager to send STX directly without calling add-to-reward-pool
+;; Breaking the circular dependency
+(define-public (receive-platform-fees)
+    (let (
+        ;; Get the current contract balance
+        (contract-balance (stx-get-balance (as-contract tx-sender)))
+        ;; Calculate new funds (current balance minus already tracked reward pool)
+        (new-funds (if (> contract-balance (var-get reward-pool))
+            (- contract-balance (var-get reward-pool))
+            u0
+        ))
+    )
+    ;; Only platform manager can trigger this
+    (asserts! (is-eq contract-caller .platform-manager) (err ERR_UNAUTHORIZED))
+
+    ;; Add new funds to reward pool
+    (if (> new-funds u0)
+        (var-set reward-pool (+ (var-get reward-pool) new-funds))
+        false
+    )
+
+    (print { action: "receive-platform-fees", amount: new-funds, new-pool-total: (var-get reward-pool) })
+    (ok new-funds)
     )
 )
 

@@ -250,9 +250,201 @@
 )
 
 (define-private (check-win-condition (board (list 25 uint)) (board-size uint) (win-condition uint))
-    ;; Simplified win check - in production would implement full win detection for each board size
-    ;; This is a placeholder that always returns false for now
-    false
+    (if (is-eq board-size BOARD_3X3)
+        (check-win-3x3 board)
+        (if (is-eq board-size BOARD_4X4)
+            (check-win-4x4 board win-condition)
+            (check-win-5x5 board win-condition)
+        )
+    )
+)
+
+;; 3x3 win check (standard tic-tac-toe)
+(define-private (check-win-3x3 (board (list 25 uint)))
+    (or
+        (is-line-variant board u0 u1 u2) ;; Row 1
+        (is-line-variant board u3 u4 u5) ;; Row 2
+        (is-line-variant board u6 u7 u8) ;; Row 3
+        (is-line-variant board u0 u3 u6) ;; Column 1
+        (is-line-variant board u1 u4 u7) ;; Column 2
+        (is-line-variant board u2 u5 u8) ;; Column 3
+        (is-line-variant board u0 u4 u8) ;; Diagonal top-left to bottom-right
+        (is-line-variant board u2 u4 u6) ;; Diagonal top-right to bottom-left
+    )
+)
+
+;; 4x4 win check (depends on win condition: 3 or 4 in a row)
+(define-private (check-win-4x4 (board (list 25 uint)) (win-condition uint))
+    (if (is-eq win-condition u3)
+        (check-4x4-3-in-row board)
+        (check-4x4-4-in-row board)
+    )
+)
+
+;; Check for 3-in-a-row on 4x4 board (tactical variant)
+(define-private (check-4x4-3-in-row (board (list 25 uint)))
+    (or
+        ;; Horizontal 3-in-a-row
+        (is-line-variant board u0 u1 u2)
+        (is-line-variant board u1 u2 u3)
+        (is-line-variant board u4 u5 u6)
+        (is-line-variant board u5 u6 u7)
+        (is-line-variant board u8 u9 u10)
+        (is-line-variant board u9 u10 u11)
+        (is-line-variant board u12 u13 u14)
+        (is-line-variant board u13 u14 u15)
+        ;; Vertical 3-in-a-row
+        (is-line-variant board u0 u4 u8)
+        (is-line-variant board u4 u8 u12)
+        (is-line-variant board u1 u5 u9)
+        (is-line-variant board u5 u9 u13)
+        (is-line-variant board u2 u6 u10)
+        (is-line-variant board u6 u10 u14)
+        (is-line-variant board u3 u7 u11)
+        (is-line-variant board u7 u11 u15)
+        ;; Diagonal 3-in-a-row
+        (is-line-variant board u0 u5 u10)
+        (is-line-variant board u5 u10 u15)
+        (is-line-variant board u3 u6 u9)
+        (is-line-variant board u6 u9 u12)
+        (is-line-variant board u1 u6 u11)
+        (is-line-variant board u4 u9 u14)
+        (is-line-variant board u2 u5 u8)
+        (is-line-variant board u7 u10 u13)
+    )
+)
+
+;; Check for 4-in-a-row on 4x4 board (extended variant)
+(define-private (check-4x4-4-in-row (board (list 25 uint)))
+    (or
+        ;; Horizontal 4-in-a-row
+        (is-line-4 board u0 u1 u2 u3)
+        (is-line-4 board u4 u5 u6 u7)
+        (is-line-4 board u8 u9 u10 u11)
+        (is-line-4 board u12 u13 u14 u15)
+        ;; Vertical 4-in-a-row
+        (is-line-4 board u0 u4 u8 u12)
+        (is-line-4 board u1 u5 u9 u13)
+        (is-line-4 board u2 u6 u10 u14)
+        (is-line-4 board u3 u7 u11 u15)
+        ;; Diagonal 4-in-a-row
+        (is-line-4 board u0 u5 u10 u15)
+        (is-line-4 board u3 u6 u9 u12)
+    )
+)
+
+;; 5x5 win check (depends on win condition: 4 or 5 in a row)
+(define-private (check-win-5x5 (board (list 25 uint)) (win-condition uint))
+    (if (is-eq win-condition u4)
+        (check-5x5-4-in-row board)
+        (check-5x5-5-in-row board)
+    )
+)
+
+;; Check for 4-in-a-row on 5x5 board (strategic variant)
+(define-private (check-5x5-4-in-row (board (list 25 uint)))
+    (or
+        ;; Horizontal 4-in-a-row
+        (is-line-4 board u0 u1 u2 u3)
+        (is-line-4 board u1 u2 u3 u4)
+        (is-line-4 board u5 u6 u7 u8)
+        (is-line-4 board u6 u7 u8 u9)
+        (is-line-4 board u10 u11 u12 u13)
+        (is-line-4 board u11 u12 u13 u14)
+        (is-line-4 board u15 u16 u17 u18)
+        (is-line-4 board u16 u17 u18 u19)
+        (is-line-4 board u20 u21 u22 u23)
+        (is-line-4 board u21 u22 u23 u24)
+        ;; Vertical 4-in-a-row
+        (is-line-4 board u0 u5 u10 u15)
+        (is-line-4 board u5 u10 u15 u20)
+        (is-line-4 board u1 u6 u11 u16)
+        (is-line-4 board u6 u11 u16 u21)
+        (is-line-4 board u2 u7 u12 u17)
+        (is-line-4 board u7 u12 u17 u22)
+        (is-line-4 board u3 u8 u13 u18)
+        (is-line-4 board u8 u13 u18 u23)
+        (is-line-4 board u4 u9 u14 u19)
+        (is-line-4 board u9 u14 u19 u24)
+        ;; Diagonal 4-in-a-row (main diagonals)
+        (is-line-4 board u0 u6 u12 u18)
+        (is-line-4 board u6 u12 u18 u24)
+        (is-line-4 board u4 u8 u12 u16)
+        (is-line-4 board u8 u12 u16 u20)
+        ;; Diagonal 4-in-a-row (secondary diagonals)
+        (is-line-4 board u1 u7 u13 u19)
+        (is-line-4 board u5 u11 u17 u23)
+        (is-line-4 board u3 u7 u11 u15)
+        (is-line-4 board u9 u13 u17 u21)
+    )
+)
+
+;; Check for 5-in-a-row on 5x5 board (large variant)
+(define-private (check-5x5-5-in-row (board (list 25 uint)))
+    (or
+        ;; Horizontal 5-in-a-row
+        (is-line-5 board u0 u1 u2 u3 u4)
+        (is-line-5 board u5 u6 u7 u8 u9)
+        (is-line-5 board u10 u11 u12 u13 u14)
+        (is-line-5 board u15 u16 u17 u18 u19)
+        (is-line-5 board u20 u21 u22 u23 u24)
+        ;; Vertical 5-in-a-row
+        (is-line-5 board u0 u5 u10 u15 u20)
+        (is-line-5 board u1 u6 u11 u16 u21)
+        (is-line-5 board u2 u7 u12 u17 u22)
+        (is-line-5 board u3 u8 u13 u18 u23)
+        (is-line-5 board u4 u9 u14 u19 u24)
+        ;; Diagonal 5-in-a-row
+        (is-line-5 board u0 u6 u12 u18 u24)
+        (is-line-5 board u4 u8 u12 u16 u20)
+    )
+)
+
+;; Helper function to check if 3 cells form a winning line
+(define-private (is-line-variant (board (list 25 uint)) (a uint) (b uint) (c uint))
+    (let (
+        (a-val (unwrap! (element-at? board a) false))
+        (b-val (unwrap! (element-at? board b) false))
+        (c-val (unwrap! (element-at? board c) false))
+    )
+    (and (is-eq a-val b-val) (is-eq a-val c-val) (not (is-eq a-val u0)))
+    )
+)
+
+;; Helper function to check if 4 cells form a winning line
+(define-private (is-line-4 (board (list 25 uint)) (a uint) (b uint) (c uint) (d uint))
+    (let (
+        (a-val (unwrap! (element-at? board a) false))
+        (b-val (unwrap! (element-at? board b) false))
+        (c-val (unwrap! (element-at? board c) false))
+        (d-val (unwrap! (element-at? board d) false))
+    )
+    (and
+        (is-eq a-val b-val)
+        (is-eq a-val c-val)
+        (is-eq a-val d-val)
+        (not (is-eq a-val u0))
+    )
+    )
+)
+
+;; Helper function to check if 5 cells form a winning line
+(define-private (is-line-5 (board (list 25 uint)) (a uint) (b uint) (c uint) (d uint) (e uint))
+    (let (
+        (a-val (unwrap! (element-at? board a) false))
+        (b-val (unwrap! (element-at? board b) false))
+        (c-val (unwrap! (element-at? board c) false))
+        (d-val (unwrap! (element-at? board d) false))
+        (e-val (unwrap! (element-at? board e) false))
+    )
+    (and
+        (is-eq a-val b-val)
+        (is-eq a-val c-val)
+        (is-eq a-val d-val)
+        (is-eq a-val e-val)
+        (not (is-eq a-val u0))
+    )
+    )
 )
 
 ;; read only functions

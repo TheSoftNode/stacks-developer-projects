@@ -119,3 +119,25 @@
         (ok true)
     )
 )
+
+;; get-position-liquidity
+;; Given a Pool ID and a user address, returns how much liquidity the user has in the pool
+(define-read-only (get-position-liquidity
+        (pool-id (buff 20))
+        (owner principal)
+    )
+    (let (
+            ;; look up the position in the `positions` map
+            (position (map-get? positions {
+                pool-id: pool-id,
+                owner: owner,
+            }))
+            ;; if position exists, return the liquidity otherwise return 0
+            (existing-owner-liquidity (if (is-some position)
+                (unwrap-panic position)
+                { liquidity: u0 }
+            ))
+        )
+        (ok (get liquidity existing-owner-liquidity))
+    )
+)

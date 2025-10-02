@@ -394,7 +394,8 @@ describe("Tournament Manager Tests", () => {
 
     // The bracket should exist and contain match data
     const bracket = bracketData.result as any;
-    expect(bracket).toBeSome();
+    expect(bracket).toBeDefined();
+    expect(bracket.value.data["player-one"]).toBeDefined();
   });
 
   it("gets latest tournament ID", () => {

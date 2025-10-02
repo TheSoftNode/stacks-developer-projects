@@ -1,54 +1,55 @@
 
 import { Cl } from "@stacks/transactions";
-import { describe, expect, it, beforeAll } from "vitest";
-
-let alice: string;
-let bob: string;
-
-// Helper function to create a new game with the given bet amount, move index, and move
-// on behalf of the `user` address
-function createGame(
-  betAmount: number,
-  moveIndex: number,
-  move: number,
-  user: string
-) {
-  return simnet.callPublicFn(
-    "tic-tac-toe",
-    "create-game",
-    [Cl.uint(betAmount), Cl.uint(moveIndex), Cl.uint(move)],
-    user
-  );
-}
-
-// Helper function to join a game with the given move index and move on behalf of the `user` address
-function joinGame(moveIndex: number, move: number, user: string) {
-  return simnet.callPublicFn(
-    "tic-tac-toe",
-    "join-game",
-    [Cl.uint(0), Cl.uint(moveIndex), Cl.uint(move)],
-    user
-  );
-}
-
-// Helper function to play a move with the given move index and move on behalf of the `user` address
-function play(moveIndex: number, move: number, user: string) {
-  return simnet.callPublicFn(
-    "tic-tac-toe",
-    "play",
-    [Cl.uint(0), Cl.uint(moveIndex), Cl.uint(move)],
-    user
-  );
-}
+import { describe, expect, it } from "vitest";
 
 describe("Tic Tac Toe Tests", () => {
-  beforeAll(() => {
+  // Get accounts from simnet - this works when called during test execution
+  const getAccounts = () => {
     const accounts = simnet.getAccounts();
-    alice = accounts.get("wallet_1")!;
-    bob = accounts.get("wallet_2")!;
-  });
+    return {
+      alice: accounts.get("wallet_1")!,
+      bob: accounts.get("wallet_2")!,
+    };
+  };
+
+  // Helper function to create a new game with the given bet amount, move index, and move
+  // on behalf of the `user` address
+  function createGame(
+    betAmount: number,
+    moveIndex: number,
+    move: number,
+    user: string
+  ) {
+    return simnet.callPublicFn(
+      "tic-tac-toe",
+      "create-game",
+      [Cl.uint(betAmount), Cl.uint(moveIndex), Cl.uint(move)],
+      user
+    );
+  }
+
+  // Helper function to join a game with the given move index and move on behalf of the `user` address
+  function joinGame(moveIndex: number, move: number, user: string) {
+    return simnet.callPublicFn(
+      "tic-tac-toe",
+      "join-game",
+      [Cl.uint(0), Cl.uint(moveIndex), Cl.uint(move)],
+      user
+    );
+  }
+
+  // Helper function to play a move with the given move index and move on behalf of the `user` address
+  function play(moveIndex: number, move: number, user: string) {
+    return simnet.callPublicFn(
+      "tic-tac-toe",
+      "play",
+      [Cl.uint(0), Cl.uint(moveIndex), Cl.uint(move)],
+      user
+    );
+  }
 
   it("allows game creation", () => {
+    const { alice } = getAccounts();
     const { result, events } = createGame(100, 0, 1, alice);
 
     expect(result).toBeOk(Cl.uint(0));

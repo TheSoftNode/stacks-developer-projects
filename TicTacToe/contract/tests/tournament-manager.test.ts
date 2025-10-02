@@ -1,21 +1,29 @@
 import { Cl } from "@stacks/transactions";
-import { describe, expect, it, beforeAll } from "vitest";
-
-let deployer: string;
-let alice: string;
-let bob: string;
-let charlie: string;
-let david: string;
+import { describe, expect, it } from "vitest";
 
 describe("Tournament Manager Tests", () => {
-  beforeAll(() => {
+  // Initialize accounts inside describe block to avoid recursive object error
+  let deployer: string;
+  let alice: string;
+  let bob: string;
+  let charlie: string;
+  let david: string;
+
+  try {
     const accounts = simnet.getAccounts();
     deployer = accounts.get("deployer")!;
     alice = accounts.get("wallet_1")!;
     bob = accounts.get("wallet_2")!;
     charlie = accounts.get("wallet_3")!;
     david = accounts.get("wallet_4")!;
-  });
+  } catch {
+    // Fallback values if simnet is not ready
+    deployer = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+    alice = "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5";
+    bob = "ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG";
+    charlie = "ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC";
+    david = "ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND";
+  }
 
   it("ensures simnet is well initialised", () => {
     expect(simnet.blockHeight).toBeDefined();

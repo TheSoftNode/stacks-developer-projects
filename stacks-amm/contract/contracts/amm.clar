@@ -38,3 +38,34 @@
     }
     { liquidity: uint }
 )
+
+;; Compute the hash of (token0 + token1 + fee) to use as a pool ID
+(define-read-only (get-pool-id (pool-info {
+    token-0: <ft-trait>,
+    token-1: <ft-trait>,
+    fee: uint,
+}))
+    (let (
+            (buff (unwrap-panic (to-consensus-buff? pool-info)))
+            (pool-id (hash160 buff))
+        )
+        pool-id
+    )
+)
+
+;; private functions
+;;
+
+;; Ensure that the token-0 principal is "less than" the token-1 principal
+(define-private (correct-token-ordering
+        (token-0 principal)
+        (token-1 principal)
+    )
+    (let (
+            (token-0-buff (unwrap-panic (to-consensus-buff? token-0)))
+            (token-1-buff (unwrap-panic (to-consensus-buff? token-1)))
+        )
+        (asserts! (< token-0-buff token-1-buff) ERR_INCORRECT_TOKEN_ORDERING)
+        (ok true)
+    )
+)

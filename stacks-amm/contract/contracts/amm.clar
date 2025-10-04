@@ -462,3 +462,11 @@
         (ok true)
     )
 )
+
+;; get-pool-data
+;; Given a pool ID, returns the current state of the pool from the mapping
+(define-read-only (get-pool-data (pool-id (buff 20)))
+    (let ((pool-data (map-get? pools pool-id)))
+        (ok pool-data)
+    )
+)

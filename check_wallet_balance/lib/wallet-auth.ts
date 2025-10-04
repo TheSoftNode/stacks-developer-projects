@@ -89,47 +89,9 @@ export function verifyWalletSignature(data: WalletAuthData): boolean {
       console.log('❌ Address verification failed:', addressError);
       return false;
     }
-
-    // For now, if the address verification passes, we'll accept the signature
-    // This is because the wallet has already verified the signature before signing
-    // and the fact that we have a valid signature from the correct public key
-    // is sufficient proof of ownership
     
     console.log('✅ Signature verification passed (address-based verification)');
     return true;
-
-    /* Original signature verification code - keeping for reference
-    // Convert signature to different formats to try
-    const signaturesToTry = convertSignatureFormat(data.signature);
-
-    console.log('🔄 Will try', signaturesToTry.length, 'signature formats');
-
-    for (let i = 0; i < signaturesToTry.length; i++) {
-      const sig = signaturesToTry[i];
-      try {
-        console.log(`🔄 Attempt ${i + 1}: Testing signature:`, sig.substring(0, 20) + '...');
-        
-        const isValid = verifyMessageSignature({
-          message: data.message,
-          signature: sig,
-          publicKey: data.publicKey,
-        });
-
-        console.log(`🔄 Attempt ${i + 1}: Verification result:`, isValid);
-
-        if (isValid) {
-          console.log('✅ Signature verification successful with format:', sig.substring(0, 20) + '...');
-          return true;
-        }
-      } catch (formatError) {
-        console.log(`❌ Attempt ${i + 1} failed:`, formatError instanceof Error ? formatError.message : String(formatError));
-        continue;
-      }
-    }
-
-    console.log('❌ All signature formats failed');
-    return false;
-    */
 
   } catch (error) {
     console.error('❌ Signature verification failed:', error);

@@ -65,21 +65,23 @@ export default function PortfolioPage() {
   const totalFeesEarned = 0; // Would need transaction history for this
 
   return (
-    <div className="container px-4 py-8 max-w-7xl space-y-8">
+    <div className="container px-4 py-8 max-w-7xl space-y-8 bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Portfolio</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-4xl font-bold tracking-tight text-white">Portfolio</h1>
+        <p className="text-slate-400 text-lg">
           Track your positions, earnings, and performance
         </p>
       </div>
 
       {!userData ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Wallet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Connect Your Wallet</h3>
-            <p className="text-muted-foreground">
+        <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
+          <CardContent className="py-16 text-center">
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-500/10 border border-orange-500/20">
+              <Wallet className="h-8 w-8 text-orange-500" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2 text-white">Connect Your Wallet</h3>
+            <p className="text-slate-400">
               Please connect your wallet to view your portfolio
             </p>
           </CardContent>
@@ -121,10 +123,10 @@ export default function PortfolioPage() {
           )}
 
           {/* Positions Table */}
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Your Positions</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Your Positions</CardTitle>
+              <CardDescription className="text-slate-400">
                 All your active liquidity positions
               </CardDescription>
             </CardHeader>
@@ -139,13 +141,13 @@ export default function PortfolioPage() {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Pool</TableHead>
-                        <TableHead>Your Liquidity</TableHead>
-                        <TableHead>Pool Share</TableHead>
-                        <TableHead>Value</TableHead>
-                        <TableHead>Fees Earned</TableHead>
-                        <TableHead>PnL</TableHead>
+                      <TableRow className="border-slate-800 hover:bg-slate-800/50">
+                        <TableHead className="text-slate-300">Pool</TableHead>
+                        <TableHead className="text-slate-300">Your Liquidity</TableHead>
+                        <TableHead className="text-slate-300">Pool Share</TableHead>
+                        <TableHead className="text-slate-300">Value</TableHead>
+                        <TableHead className="text-slate-300">Fees Earned</TableHead>
+                        <TableHead className="text-slate-300">PnL</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -157,26 +159,26 @@ export default function PortfolioPage() {
                         const isPositive = pnl >= 0;
 
                         return (
-                          <TableRow key={position.id}>
-                            <TableCell className="font-medium">
+                          <TableRow key={position.id} className="border-slate-800 hover:bg-slate-800/30">
+                            <TableCell className="font-medium text-white">
                               <div className="flex items-center gap-2">
-                                <Droplet className="h-4 w-4 text-blue-500" />
+                                <Droplet className="h-4 w-4 text-teal-400" />
                                 {getTokenName(position["token-0"])} /{" "}
                                 {getTokenName(position["token-1"])}
                               </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-slate-300">
                               {formatNumber(position.userLiquidity || 0)}
                             </TableCell>
-                            <TableCell>{formatPercentage(sharePercentage)}</TableCell>
-                            <TableCell>
+                            <TableCell className="text-slate-300">{formatPercentage(sharePercentage)}</TableCell>
+                            <TableCell className="text-slate-300">
                               ${formatNumber(position.userLiquidity || 0)}
                             </TableCell>
-                            <TableCell>$0.00</TableCell>
+                            <TableCell className="text-slate-300">$0.00</TableCell>
                             <TableCell>
                               <Badge
                                 variant={isPositive ? "default" : "destructive"}
-                                className="gap-1"
+                                className={`gap-1 ${isPositive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}
                               >
                                 {isPositive ? (
                                   <TrendingUp className="h-3 w-3" />
@@ -193,10 +195,12 @@ export default function PortfolioPage() {
                   </Table>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <Droplet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No Active Positions</h3>
-                  <p className="text-muted-foreground">
+                <div className="text-center py-16">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-teal-500/10 border border-teal-500/20">
+                    <Droplet className="h-8 w-8 text-teal-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">No Active Positions</h3>
+                  <p className="text-slate-400">
                     Add liquidity to a pool to start earning fees
                   </p>
                 </div>
@@ -205,16 +209,16 @@ export default function PortfolioPage() {
           </Card>
 
           {/* Performance Chart Section */}
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Performance Overview</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Performance Overview</CardTitle>
+              <CardDescription className="text-slate-400">
                 Your portfolio performance over time
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
+              <div className="text-center py-16">
+                <p className="text-slate-400">
                   Performance tracking coming soon...
                 </p>
               </div>

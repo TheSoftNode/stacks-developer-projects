@@ -80,13 +80,13 @@ export default function HistoryPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "success":
-        return "default";
+        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
       case "pending":
-        return "secondary";
+        return "bg-orange-500/10 text-orange-400 border-orange-500/20";
       case "failed":
-        return "destructive";
+        return "bg-red-500/10 text-red-400 border-red-500/20";
       default:
-        return "secondary";
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
 
@@ -105,44 +105,44 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="container px-4 py-8 max-w-7xl space-y-8">
+    <div className="container px-4 py-8 max-w-7xl space-y-8 bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">Transaction History</h1>
-          <p className="text-muted-foreground text-lg">
+          <h1 className="text-4xl font-bold tracking-tight text-white">Transaction History</h1>
+          <p className="text-slate-400 text-lg">
             View all your past transactions and activity
           </p>
         </div>
-        <Button onClick={exportToCSV} variant="outline" className="gap-2">
+        <Button onClick={exportToCSV} variant="outline" className="gap-2 border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-orange-500/30 text-slate-300 hover:text-orange-400">
           <Download className="h-4 w-4" />
           Export CSV
         </Button>
       </div>
 
       {/* Filters */}
-      <Card className="border-2">
+      <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <Input
                 placeholder="Search by pool or transaction ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-teal-500/30"
               />
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px] border-slate-700 bg-slate-900/50 text-white hover:border-orange-500/30">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="swap">Swaps</SelectItem>
-                <SelectItem value="add">Add Liquidity</SelectItem>
-                <SelectItem value="remove">Remove Liquidity</SelectItem>
-                <SelectItem value="create">Create Pool</SelectItem>
+              <SelectContent className="border-slate-800 bg-slate-900">
+                <SelectItem value="all" className="text-slate-300 hover:text-white hover:bg-slate-800">All Types</SelectItem>
+                <SelectItem value="swap" className="text-slate-300 hover:text-white hover:bg-slate-800">Swaps</SelectItem>
+                <SelectItem value="add" className="text-slate-300 hover:text-white hover:bg-slate-800">Add Liquidity</SelectItem>
+                <SelectItem value="remove" className="text-slate-300 hover:text-white hover:bg-slate-800">Remove Liquidity</SelectItem>
+                <SelectItem value="create" className="text-slate-300 hover:text-white hover:bg-slate-800">Create Pool</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -150,10 +150,10 @@ export default function HistoryPage() {
       </Card>
 
       {/* Transactions Table */}
-      <Card className="border-2">
+      <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>All Transactions</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">All Transactions</CardTitle>
+          <CardDescription className="text-slate-400">
             {filteredTransactions.length} transaction(s) found
           </CardDescription>
         </CardHeader>
@@ -162,39 +162,39 @@ export default function HistoryPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Pool</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Transaction</TableHead>
+                  <TableRow className="border-slate-800 hover:bg-slate-800/50">
+                    <TableHead className="text-slate-300">Type</TableHead>
+                    <TableHead className="text-slate-300">Pool</TableHead>
+                    <TableHead className="text-slate-300">Amount</TableHead>
+                    <TableHead className="text-slate-300">Status</TableHead>
+                    <TableHead className="text-slate-300">Time</TableHead>
+                    <TableHead className="text-slate-300">Transaction</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredTransactions.map((tx) => (
-                    <TableRow key={tx.id}>
+                    <TableRow key={tx.id} className="border-slate-800 hover:bg-slate-800/30">
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-white">
                           {getTypeIcon(tx.type)}
                           <span className="font-medium">{getTypeLabel(tx.type)}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{tx.pool}</TableCell>
-                      <TableCell>{tx.amount}</TableCell>
+                      <TableCell className="text-slate-300">{tx.pool}</TableCell>
+                      <TableCell className="text-slate-300">{tx.amount}</TableCell>
                       <TableCell>
-                        <Badge variant={getStatusColor(tx.status) as any}>
+                        <Badge className={getStatusColor(tx.status)}>
                           {tx.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-slate-300">
                         {new Date(tx.timestamp).toLocaleString()}
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="gap-2"
+                          className="gap-2 text-teal-400 hover:text-teal-300 hover:bg-slate-800"
                           onClick={() => window.open(getExplorerUrl("tx", tx.txId), "_blank")}
                         >
                           {abbreviateTxnId(tx.txId)}
@@ -207,10 +207,12 @@ export default function HistoryPage() {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <ArrowUpDown className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">No Transactions Yet</h3>
-              <p className="text-muted-foreground">
+            <div className="text-center py-16">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-800/50 border border-slate-700">
+                <ArrowUpDown className="h-8 w-8 text-slate-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-white">No Transactions Yet</h3>
+              <p className="text-slate-400">
                 {searchQuery || filterType !== "all"
                   ? "No transactions match your filters"
                   : "Your transaction history will appear here"}

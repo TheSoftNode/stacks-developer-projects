@@ -43,11 +43,11 @@ export default function AnalyticsPage() {
   const totalTVL = pools.reduce((sum, pool) => sum + (pool.tvl || 0), 0);
 
   return (
-    <div className="container px-4 py-8 max-w-7xl space-y-8">
+    <div className="container px-4 py-8 max-w-7xl space-y-8 bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-4xl font-bold tracking-tight text-white">Analytics</h1>
+        <p className="text-slate-400 text-lg">
           Comprehensive market statistics and insights
         </p>
       </div>
@@ -96,50 +96,53 @@ export default function AnalyticsPage() {
       <AnalyticsCharts />
 
       {/* Pools Table */}
-      <Card className="border-2">
+      <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>All Pools</CardTitle>
-          <CardDescription>Detailed pool statistics</CardDescription>
+          <CardTitle className="text-white">All Pools</CardTitle>
+          <CardDescription className="text-slate-400">Detailed pool statistics</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
+                <Skeleton key={i} className="h-12 w-full bg-slate-800" />
               ))}
             </div>
           ) : pools.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Pool</TableHead>
-                    <TableHead>TVL</TableHead>
-                    <TableHead>Liquidity</TableHead>
-                    <TableHead>Fee</TableHead>
-                    <TableHead>APY</TableHead>
-                    <TableHead>24h Volume</TableHead>
+                  <TableRow className="border-slate-800 hover:bg-slate-800/50">
+                    <TableHead className="text-slate-300">Pool</TableHead>
+                    <TableHead className="text-slate-300">TVL</TableHead>
+                    <TableHead className="text-slate-300">Liquidity</TableHead>
+                    <TableHead className="text-slate-300">Fee</TableHead>
+                    <TableHead className="text-slate-300">APY</TableHead>
+                    <TableHead className="text-slate-300">24h Volume</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pools.map((pool) => (
-                    <TableRow key={pool.id}>
-                      <TableCell className="font-medium">
+                    <TableRow key={pool.id} className="border-slate-800 hover:bg-slate-800/30">
+                      <TableCell className="font-medium text-white">
                         {getTokenName(pool["token-0"])} / {getTokenName(pool["token-1"])}
                       </TableCell>
-                      <TableCell>${formatNumber(pool.tvl || 0)}</TableCell>
-                      <TableCell>{formatNumber(pool.liquidity)}</TableCell>
-                      <TableCell>{formatPercentage(pool.fee / 10_000)}</TableCell>
-                      <TableCell>{formatPercentage(pool.apy || 0)}</TableCell>
-                      <TableCell>$0</TableCell>
+                      <TableCell className="text-slate-300">${formatNumber(pool.tvl || 0)}</TableCell>
+                      <TableCell className="text-slate-300">{formatNumber(pool.liquidity)}</TableCell>
+                      <TableCell className="text-slate-300">{formatPercentage(pool.fee / 10_000)}</TableCell>
+                      <TableCell className="text-emerald-400 font-medium">{formatPercentage(pool.apy || 0)}</TableCell>
+                      <TableCell className="text-slate-300">$0</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
+            <div className="text-center py-16">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-800/50 border border-slate-700">
+                <Droplet className="h-8 w-8 text-slate-500" />
+              </div>
+              <p className="text-slate-400">
                 No pools available yet
               </p>
             </div>

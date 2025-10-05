@@ -30,11 +30,11 @@ export default function LiquidityPage() {
   };
 
   return (
-    <div className="container px-4 py-8 max-w-7xl space-y-8">
+    <div className="container px-4 py-8 max-w-7xl space-y-8 bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Manage Liquidity</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-4xl font-bold tracking-tight text-white">Manage Liquidity</h1>
+        <p className="text-slate-400 text-lg">
           Add or remove liquidity from pools and earn trading fees
         </p>
       </div>
@@ -42,16 +42,26 @@ export default function LiquidityPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           {loading ? (
-            <Card>
+            <Card className="border border-slate-800 bg-slate-950/50">
               <CardContent className="p-6">
-                <Skeleton className="h-96 w-full" />
+                <Skeleton className="h-96 w-full bg-slate-800" />
               </CardContent>
             </Card>
           ) : pools.length > 0 ? (
             <Tabs defaultValue="add" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="add">Add Liquidity</TabsTrigger>
-                <TabsTrigger value="remove">Remove Liquidity</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-slate-950/50 border border-slate-800">
+                <TabsTrigger
+                  value="add"
+                  className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 data-[state=active]:border-orange-500/20 text-slate-400"
+                >
+                  Add Liquidity
+                </TabsTrigger>
+                <TabsTrigger
+                  value="remove"
+                  className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 data-[state=active]:border-orange-500/20 text-slate-400"
+                >
+                  Remove Liquidity
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="add" className="mt-6">
@@ -63,10 +73,10 @@ export default function LiquidityPage() {
               </TabsContent>
             </Tabs>
           ) : (
-            <Card>
+            <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>No Pools Available</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white">No Pools Available</CardTitle>
+                <CardDescription className="text-slate-400">
                   There are no liquidity pools available yet. Create a pool first.
                 </CardDescription>
               </CardHeader>
@@ -76,16 +86,16 @@ export default function LiquidityPage() {
 
         {/* Info Sidebar */}
         <div className="space-y-4">
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm hover:border-slate-700 transition-all">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <Droplet className="h-5 w-5 text-blue-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/20">
+                  <Droplet className="h-5 w-5 text-teal-400" />
                 </div>
-                <CardTitle className="text-lg">About Liquidity</CardTitle>
+                <CardTitle className="text-lg text-white">About Liquidity</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-slate-400">
               <p>
                 When you add liquidity, you'll receive LP tokens representing your share of the pool.
               </p>
@@ -98,16 +108,16 @@ export default function LiquidityPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm hover:border-slate-700 transition-all">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-green-500/10">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <TrendingUp className="h-5 w-5 text-emerald-400" />
                 </div>
-                <CardTitle className="text-lg">Earning Fees</CardTitle>
+                <CardTitle className="text-lg text-white">Earning Fees</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-slate-400">
               <p>
                 Liquidity providers earn fees from every swap in their pool.
               </p>
@@ -120,26 +130,26 @@ export default function LiquidityPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-2 bg-orange-500/5">
+          <Card className="border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-slate-950/50 backdrop-blur-sm">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-orange-500/10">
-                  <AlertCircle className="h-5 w-5 text-orange-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <AlertCircle className="h-5 w-5 text-orange-400" />
                 </div>
-                <CardTitle className="text-lg">Important Notes</CardTitle>
+                <CardTitle className="text-lg text-white">Important Notes</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-slate-400">
               <p className="flex items-start gap-2">
-                <span className="text-orange-500">•</span>
+                <span className="text-orange-400">•</span>
                 Be aware of impermanent loss when providing liquidity
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-orange-500">•</span>
+                <span className="text-orange-400">•</span>
                 Ensure you have both tokens before adding liquidity
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-orange-500">•</span>
+                <span className="text-orange-400">•</span>
                 Your funds are always in your control
               </p>
             </CardContent>

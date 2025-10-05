@@ -45,23 +45,23 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
   };
 
   return (
-    <Card>
+    <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Add Liquidity</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-white">Add Liquidity</CardTitle>
+        <CardDescription className="text-slate-400">
           Add liquidity to a pool and earn trading fees
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label>Select Pool</Label>
+          <Label className="text-slate-300">Select Pool</Label>
           <Select value={selectedPoolId} onValueChange={setSelectedPoolId}>
-            <SelectTrigger>
+            <SelectTrigger className="border-slate-700 bg-slate-900/50 text-white hover:border-orange-500/30">
               <SelectValue placeholder="Choose a pool" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border-slate-800 bg-slate-900">
               {pools.map((pool) => (
-                <SelectItem key={pool.id} value={pool.id}>
+                <SelectItem key={pool.id} value={pool.id} className="text-slate-300 hover:text-white hover:bg-slate-800">
                   {getTokenName(pool["token-0"])} / {getTokenName(pool["token-1"])}
                 </SelectItem>
               ))}
@@ -71,44 +71,46 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
 
         {selectedPool && (
           <>
-            <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
+            <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-4 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Pool Liquidity</span>
-                <span className="font-medium">{formatNumber(selectedPool.liquidity)}</span>
+                <span className="text-slate-400">Pool Liquidity</span>
+                <span className="font-medium text-white">{formatNumber(selectedPool.liquidity)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Current Ratio</span>
-                <span className="font-medium">
+                <span className="text-slate-400">Current Ratio</span>
+                <span className="font-medium text-white">
                   1 : {(selectedPool["balance-1"] / selectedPool["balance-0"]).toFixed(4)}
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>{getTokenName(selectedPool["token-0"])} Amount</Label>
+              <Label className="text-slate-300">{getTokenName(selectedPool["token-0"])} Amount</Label>
               <Input
                 type="number"
                 placeholder="0.0"
                 value={amount0}
                 onChange={(e) => setAmount0(e.target.value)}
+                className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-slate-500">
                 Available: {formatNumber(selectedPool["balance-0"])}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>{getTokenName(selectedPool["token-1"])} Amount</Label>
+              <Label className="text-slate-300">{getTokenName(selectedPool["token-1"])} Amount</Label>
               <Input
                 type="number"
                 placeholder="0.0"
                 value={amount1}
                 onChange={(e) => setAmount1(e.target.value)}
                 disabled={selectedPool.liquidity > 0}
+                className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30 disabled:opacity-50"
               />
-              <p className="text-xs text-muted-foreground">
-                {selectedPool.liquidity > 0 
-                  ? "Amount calculated based on pool ratio" 
+              <p className="text-xs text-slate-500">
+                {selectedPool.liquidity > 0
+                  ? "Amount calculated based on pool ratio"
                   : "Initial liquidity - enter any amount"}
               </p>
             </div>
@@ -118,7 +120,7 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={!userData || !selectedPool || !amount0 || !amount1 || isLoading}
-          className="w-full"
+          className="w-full bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all"
         >
           {!userData
             ? "Connect Wallet"

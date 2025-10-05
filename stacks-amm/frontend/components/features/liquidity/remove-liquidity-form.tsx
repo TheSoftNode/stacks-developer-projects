@@ -68,23 +68,23 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
     : 0;
 
   return (
-    <Card>
+    <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Remove Liquidity</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-white">Remove Liquidity</CardTitle>
+        <CardDescription className="text-slate-400">
           Remove your liquidity from a pool
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label>Select Pool</Label>
+          <Label className="text-slate-300">Select Pool</Label>
           <Select value={selectedPoolId} onValueChange={setSelectedPoolId}>
-            <SelectTrigger>
+            <SelectTrigger className="border-slate-700 bg-slate-900/50 text-white hover:border-orange-500/30">
               <SelectValue placeholder="Choose a pool" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="border-slate-800 bg-slate-900">
               {pools.map((pool) => (
-                <SelectItem key={pool.id} value={pool.id}>
+                <SelectItem key={pool.id} value={pool.id} className="text-slate-300 hover:text-white hover:bg-slate-800">
                   {getTokenName(pool["token-0"])} / {getTokenName(pool["token-1"])}
                 </SelectItem>
               ))}
@@ -94,24 +94,24 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
 
         {selectedPool && (
           <>
-            <div className="rounded-lg bg-muted p-4 space-y-2 text-sm">
+            <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-4 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Your Liquidity</span>
-                <span className="font-medium">{formatNumber(userLiquidity)}</span>
+                <span className="text-slate-400">Your Liquidity</span>
+                <span className="font-medium text-white">{formatNumber(userLiquidity)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Your Pool Share</span>
-                <span className="font-medium">
+                <span className="text-slate-400">Your Pool Share</span>
+                <span className="font-medium text-white">
                   {calculateSharePercentage(userLiquidity, selectedPool.liquidity).toFixed(2)}%
                 </span>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between">
-                  <Label>Amount to Remove</Label>
-                  <span className="text-sm text-muted-foreground">
+                  <Label className="text-slate-300">Amount to Remove</Label>
+                  <span className="text-sm text-orange-400 font-medium">
                     {liquidityPercentage.toFixed(0)}%
                   </span>
                 </div>
@@ -122,7 +122,10 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
                   step="1"
                   value={liquidityPercentage}
                   onChange={(e) => handlePercentageChange([parseInt(e.target.value)])}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                  style={{
+                    background: `linear-gradient(to right, rgb(249 115 22) 0%, rgb(249 115 22) ${liquidityPercentage}%, rgb(51 65 85) ${liquidityPercentage}%, rgb(51 65 85) 100%)`
+                  }}
                 />
                 <div className="flex gap-2">
                   {[25, 50, 75, 100].map((percent) => (
@@ -131,7 +134,7 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => handlePercentageChange([percent])}
-                      className="flex-1"
+                      className="flex-1 border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-orange-500/30 text-slate-300 hover:text-orange-400"
                     >
                       {percent}%
                     </Button>
@@ -140,32 +143,33 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label>Liquidity Amount</Label>
+                <Label className="text-slate-300">Liquidity Amount</Label>
                 <Input
                   type="number"
                   placeholder="0.0"
                   value={liquidityAmount}
                   onChange={(e) => setLiquidityAmount(e.target.value)}
                   max={userLiquidity}
+                  className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
                 />
               </div>
             </div>
 
             {liquidityAmount && parseFloat(liquidityAmount) > 0 && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <p className="text-sm font-medium">You will receive:</p>
-                <div className="space-y-1 text-sm">
+              <div className="rounded-xl border border-slate-700 bg-slate-800/30 p-4 space-y-2">
+                <p className="text-sm font-medium text-white">You will receive:</p>
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
+                    <span className="text-slate-400">
                       {getTokenName(selectedPool["token-0"])}:
                     </span>
-                    <span className="font-medium">{estimatedToken0.toFixed(6)}</span>
+                    <span className="font-medium text-white">{estimatedToken0.toFixed(6)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
+                    <span className="text-slate-400">
                       {getTokenName(selectedPool["token-1"])}:
                     </span>
-                    <span className="font-medium">{estimatedToken1.toFixed(6)}</span>
+                    <span className="font-medium text-white">{estimatedToken1.toFixed(6)}</span>
                   </div>
                 </div>
               </div>
@@ -182,7 +186,7 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
             parseFloat(liquidityAmount) > userLiquidity ||
             isLoading
           }
-          className="w-full"
+          className="w-full bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all"
         >
           {!userData
             ? "Connect Wallet"

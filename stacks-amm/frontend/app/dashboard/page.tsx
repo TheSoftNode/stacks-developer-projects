@@ -73,47 +73,47 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link href="/dashboard/swap">
-          <Card className="hover:shadow-xl hover:shadow-orange-500/10 transition-all cursor-pointer border border-slate-800 hover:border-orange-500/30 bg-slate-950/50 backdrop-blur-sm group">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
-              <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 group-hover:scale-110 transition-transform duration-300">
-                <ArrowLeftRight className="h-6 w-6 text-orange-500" />
+          <Card className="hover:shadow-lg hover:shadow-orange-500/10 transition-all cursor-pointer border border-slate-800 hover:border-orange-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/20 group-hover:scale-110 transition-transform duration-300">
+                <ArrowLeftRight className="h-4 w-4 text-orange-500" />
               </div>
-              <p className="font-semibold text-white group-hover:text-orange-400 transition-colors">Swap</p>
+              <p className="text-sm font-semibold text-white group-hover:text-orange-400 transition-colors">Swap</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/pools">
-          <Card className="hover:shadow-xl hover:shadow-teal-500/10 transition-all cursor-pointer border border-slate-800 hover:border-teal-500/30 bg-slate-950/50 backdrop-blur-sm group">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
-              <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
-                <Droplet className="h-6 w-6 text-teal-400" />
+          <Card className="hover:shadow-lg hover:shadow-teal-500/10 transition-all cursor-pointer border border-slate-800 hover:border-teal-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+                <Droplet className="h-4 w-4 text-teal-400" />
               </div>
-              <p className="font-semibold text-white group-hover:text-teal-400 transition-colors">Pools</p>
+              <p className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors">Pools</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/liquidity">
-          <Card className="hover:shadow-xl hover:shadow-emerald-500/10 transition-all cursor-pointer border border-slate-800 hover:border-emerald-500/30 bg-slate-950/50 backdrop-blur-sm group">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
-                <Plus className="h-6 w-6 text-emerald-400" />
+          <Card className="hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer border border-slate-800 hover:border-emerald-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                <Plus className="h-4 w-4 text-emerald-400" />
               </div>
-              <p className="font-semibold text-white group-hover:text-emerald-400 transition-colors">Add Liquidity</p>
+              <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">Liquidity</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/analytics">
-          <Card className="hover:shadow-xl hover:shadow-blue-500/10 transition-all cursor-pointer border border-slate-800 hover:border-blue-500/30 bg-slate-950/50 backdrop-blur-sm group">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
-              <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-                <TrendingUp className="h-6 w-6 text-blue-400" />
+          <Card className="hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-pointer border border-slate-800 hover:border-blue-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-4 w-4 text-blue-400" />
               </div>
-              <p className="font-semibold text-white group-hover:text-blue-400 transition-colors">Analytics</p>
+              <p className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">Analytics</p>
             </CardContent>
           </Card>
         </Link>

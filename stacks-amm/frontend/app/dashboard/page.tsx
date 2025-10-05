@@ -59,14 +59,14 @@ export default function DashboardPage() {
   const userPositions = userPools.length;
 
   return (
-    <div className="container px-4 py-8 space-y-8 max-w-7xl">
+    <div className="container px-4 py-8 space-y-8 max-w-7xl bg-slate-900 min-h-screen">
       {/* Welcome Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">
+        <h1 className="text-4xl font-bold tracking-tight text-white">
           Welcome back{userData ? `, ${userData.profile.stxAddress.testnet.substring(0, 8)}...` : ""}
         </h1>
-        <p className="text-muted-foreground text-lg">
-          {userData 
+        <p className="text-slate-400 text-lg">
+          {userData
             ? "Here's an overview of your DeFi portfolio and market activity"
             : "Connect your wallet to view your portfolio"}
         </p>
@@ -75,45 +75,45 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Link href="/dashboard/swap">
-          <Card className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/50">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-2">
-              <div className="p-3 rounded-full bg-blue-500/10">
-                <ArrowLeftRight className="h-6 w-6 text-blue-500" />
+          <Card className="hover:shadow-xl hover:shadow-orange-500/10 transition-all cursor-pointer border border-slate-800 hover:border-orange-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
+              <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 group-hover:scale-110 transition-transform duration-300">
+                <ArrowLeftRight className="h-6 w-6 text-orange-500" />
               </div>
-              <p className="font-semibold">Swap</p>
+              <p className="font-semibold text-white group-hover:text-orange-400 transition-colors">Swap</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/pools">
-          <Card className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/50">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-2">
-              <div className="p-3 rounded-full bg-purple-500/10">
-                <Droplet className="h-6 w-6 text-purple-500" />
+          <Card className="hover:shadow-xl hover:shadow-teal-500/10 transition-all cursor-pointer border border-slate-800 hover:border-teal-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
+              <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+                <Droplet className="h-6 w-6 text-teal-400" />
               </div>
-              <p className="font-semibold">Pools</p>
+              <p className="font-semibold text-white group-hover:text-teal-400 transition-colors">Pools</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/liquidity">
-          <Card className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/50">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-2">
-              <div className="p-3 rounded-full bg-green-500/10">
-                <Plus className="h-6 w-6 text-green-500" />
+          <Card className="hover:shadow-xl hover:shadow-emerald-500/10 transition-all cursor-pointer border border-slate-800 hover:border-emerald-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                <Plus className="h-6 w-6 text-emerald-400" />
               </div>
-              <p className="font-semibold">Add Liquidity</p>
+              <p className="font-semibold text-white group-hover:text-emerald-400 transition-colors">Add Liquidity</p>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/analytics">
-          <Card className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/50">
-            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-2">
-              <div className="p-3 rounded-full bg-orange-500/10">
-                <TrendingUp className="h-6 w-6 text-orange-500" />
+          <Card className="hover:shadow-xl hover:shadow-blue-500/10 transition-all cursor-pointer border border-slate-800 hover:border-blue-500/30 bg-slate-950/50 backdrop-blur-sm group">
+            <CardContent className="pt-6 pb-6 flex flex-col items-center gap-3">
+              <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-6 w-6 text-blue-400" />
               </div>
-              <p className="font-semibold">Analytics</p>
+              <p className="font-semibold text-white group-hover:text-blue-400 transition-colors">Analytics</p>
             </CardContent>
           </Card>
         </Link>
@@ -164,13 +164,13 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Your Positions */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold">Your Liquidity Positions</h2>
-              <p className="text-muted-foreground">Pools where you've provided liquidity</p>
+              <h2 className="text-2xl font-bold text-white">Your Liquidity Positions</h2>
+              <p className="text-slate-400">Pools where you've provided liquidity</p>
             </div>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" className="border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-orange-500/30 text-slate-300 hover:text-orange-400">
               <Link href="/dashboard/liquidity">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Liquidity
@@ -181,9 +181,9 @@ export default function DashboardPage() {
           {loading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <Card key={i}>
+                <Card key={i} className="border border-slate-800 bg-slate-950/50">
                   <CardContent className="p-6">
-                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-20 w-full bg-slate-800" />
                   </CardContent>
                 </Card>
               ))}
@@ -195,18 +195,20 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Droplet className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Active Positions</h3>
-                <p className="text-muted-foreground mb-4">
+            <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
+              <CardContent className="py-16 text-center">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-teal-500/10 border border-teal-500/20">
+                  <Droplet className="h-8 w-8 text-teal-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-white">No Active Positions</h3>
+                <p className="text-slate-400 mb-6 max-w-md mx-auto">
                   {userData
-                    ? "You haven't provided liquidity to any pools yet."
+                    ? "You haven't provided liquidity to any pools yet. Start earning fees by providing liquidity."
                     : "Connect your wallet to view your positions"}
                 </p>
                 {userData && (
-                  <Button asChild>
-                    <Link href="/dashboard/liquidity">Add Liquidity</Link>
+                  <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-500/20">
+                    <Link href="/dashboard/liquidity">Add Liquidity Now</Link>
                   </Button>
                 )}
               </CardContent>
@@ -215,18 +217,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Top Pools Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold">Top Pools</h2>
-            <p className="text-muted-foreground">Highest TVL pools</p>
+            <h2 className="text-2xl font-bold text-white">Top Pools</h2>
+            <p className="text-slate-400">Highest TVL pools</p>
           </div>
 
           {loading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <Card key={i}>
+                <Card key={i} className="border border-slate-800 bg-slate-950/50">
                   <CardContent className="p-4">
-                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full bg-slate-800" />
                   </CardContent>
                 </Card>
               ))}
@@ -238,14 +240,14 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <Card>
+            <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
               <CardContent className="py-8 text-center">
-                <p className="text-muted-foreground">No pools available</p>
+                <p className="text-slate-400">No pools available</p>
               </CardContent>
             </Card>
           )}
 
-          <Button asChild variant="outline" className="w-full">
+          <Button asChild variant="outline" className="w-full border-slate-700 bg-slate-900/50 hover:bg-slate-800 hover:border-teal-500/30 text-slate-300 hover:text-teal-400">
             <Link href="/dashboard/pools">View All Pools</Link>
           </Button>
         </div>

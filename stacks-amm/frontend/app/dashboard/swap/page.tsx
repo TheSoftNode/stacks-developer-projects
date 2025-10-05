@@ -28,11 +28,11 @@ export default function SwapPage() {
   };
 
   return (
-    <div className="container px-4 py-8 max-w-7xl space-y-8">
+    <div className="container px-4 py-8 max-w-7xl space-y-8 bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Swap Tokens</h1>
-        <p className="text-muted-foreground text-lg">
+        <h1 className="text-4xl font-bold tracking-tight text-white">Swap Tokens</h1>
+        <p className="text-slate-400 text-lg">
           Trade tokens instantly with the best rates and minimal slippage
         </p>
       </div>
@@ -41,23 +41,23 @@ export default function SwapPage() {
         {/* Swap Form */}
         <div className="lg:col-span-2">
           {loading ? (
-            <Card>
+            <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
               <CardHeader>
-                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-6 w-32 bg-slate-800" />
               </CardHeader>
               <CardContent className="space-y-4">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-20 w-full bg-slate-800" />
+                <Skeleton className="h-20 w-full bg-slate-800" />
+                <Skeleton className="h-12 w-full bg-slate-800" />
               </CardContent>
             </Card>
           ) : pools.length > 0 ? (
             <SwapForm pools={pools} />
           ) : (
-            <Card>
+            <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>No Pools Available</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white">No Pools Available</CardTitle>
+                <CardDescription className="text-slate-400">
                   There are no liquidity pools available yet. Create a pool to start trading.
                 </CardDescription>
               </CardHeader>
@@ -67,74 +67,74 @@ export default function SwapPage() {
 
         {/* Info Sidebar */}
         <div className="space-y-4">
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm hover:border-slate-700 transition-all">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <TrendingUp className="h-5 w-5 text-blue-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/20">
+                  <TrendingUp className="h-5 w-5 text-teal-400" />
                 </div>
-                <CardTitle className="text-lg">How Swaps Work</CardTitle>
+                <CardTitle className="text-lg text-white">How Swaps Work</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">1</div>
-                <p className="text-muted-foreground">Select the tokens you want to trade</p>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xs font-bold text-orange-500">1</div>
+                <p className="text-slate-400">Select the tokens you want to trade</p>
               </div>
               <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">2</div>
-                <p className="text-muted-foreground">Enter the amount you want to swap</p>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xs font-bold text-orange-500">2</div>
+                <p className="text-slate-400">Enter the amount you want to swap</p>
               </div>
               <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">3</div>
-                <p className="text-muted-foreground">Review the estimated output and price impact</p>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xs font-bold text-orange-500">3</div>
+                <p className="text-slate-400">Review the estimated output and price impact</p>
               </div>
               <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">4</div>
-                <p className="text-muted-foreground">Confirm the transaction in your wallet</p>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xs font-bold text-orange-500">4</div>
+                <p className="text-slate-400">Confirm the transaction in your wallet</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2">
+          <Card className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm hover:border-slate-700 transition-all">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-green-500/10">
-                  <Zap className="h-5 w-5 text-green-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <Zap className="h-5 w-5 text-emerald-400" />
                 </div>
-                <CardTitle className="text-lg">Trading Tips</CardTitle>
+                <CardTitle className="text-lg text-white">Trading Tips</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="space-y-3 text-sm text-slate-400">
               <p className="flex items-start gap-2">
-                <span className="text-green-500">•</span>
+                <span className="text-emerald-400">•</span>
                 Watch out for price impact on large trades
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-green-500">•</span>
+                <span className="text-emerald-400">•</span>
                 Set appropriate slippage tolerance
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-green-500">•</span>
+                <span className="text-emerald-400">•</span>
                 Trading fees go to liquidity providers
               </p>
               <p className="flex items-start gap-2">
-                <span className="text-green-500">•</span>
+                <span className="text-emerald-400">•</span>
                 Double-check token addresses before swapping
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 bg-gradient-to-br from-blue-500/5 to-purple-600/5">
+          <Card className="border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-slate-950/50 backdrop-blur-sm">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <Shield className="h-5 w-5 text-purple-500" />
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <Shield className="h-5 w-5 text-blue-400" />
                 </div>
-                <CardTitle className="text-lg">Security</CardTitle>
+                <CardTitle className="text-lg text-white">Security</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
+            <CardContent className="text-sm text-slate-400">
               <p>
                 All swaps are executed through audited smart contracts. Your funds never leave your wallet until the transaction is confirmed.
               </p>

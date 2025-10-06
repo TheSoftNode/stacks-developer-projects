@@ -105,7 +105,7 @@ describe("AMM Tests", () => {
     const { result, events } = createPool();
 
     expect(result).toBeOk(Cl.bool(true));
-    expect(events.length).toBe(1);
+    expect(events.length).toBe(2); // Now includes STX transfer for fee
   });
 
   it("disallows creation of same pool twice", () => {
@@ -197,5 +197,119 @@ describe("AMM Tests", () => {
       withdrawableTokenOnePreSwap
     );
     expect(tokenTwoAmountWithdrawn).toBeLessThan(withdrawableTokenTwoPreSwap);
+  });
+
+  // Treasury Feature Tests
+  describe("Treasury Feature", () => {
+    it("should charge pool creation fee", () => {
+      const aliceBalanceBefore = simnet.getAssetsMap().get("STX")?.get(alice) || 0n;
+
+      const { result, events } = createPool();
+
+      expect(result).toBeOk(Cl.bool(true));
+
+      // Check STX transfer event for fee payment
+      const stxTransferEvent = events.find(e => e.event === "stx_transfer_event");
+      expect(stxTransferEvent).toBeDefined();
+      expect(stxTransferEvent?.data.amount).toBe("1000000"); // 1 STX
+      expect(stxTransferEvent?.data.sender).toBe(alice);
+
+      const aliceBalanceAfter = simnet.getAssetsMap().get("STX")?.get(alice) || 0n;
+      expect(aliceBalanceBefore - aliceBalanceAfter).toBe(1000000n);
+    });
+
+    it("should track treasury balance correctly", () => {
+      // Check initial treasury balance
+      const initialBalance = simnet.callReadOnlyFn(
+        "amm",
+        "get-treasury-balance",
+        [],
+        alice
+      );
+      expect(initialBalance.result).toBeOk(Cl.uint(0));
+
+      // Create first pool
+      createPool();
+
+      // Check treasury after first pool
+      const balanceAfterOne = simnet.callReadOnlyFn(
+        "amm",
+        "get-treasury-balance",
+        [],
+        alice
+      );
+      expect(balanceAfterOne.result).toBeOk(Cl.uint(1000000));
+
+      // Create second pool with different tokens (would need different mock tokens in real scenario)
+      // For this test, we'll just verify the increment logic
+    });
+
+    it("should allow contract owner to withdraw treasury", () => {
+      createPool();
+
+      const treasuryBalance = simnet.callReadOnlyFn(
+        "amm",
+        "get-treasury-balance",
+        [],
+        deployer
+      );
+      expect(treasuryBalance.result).toBeOk(Cl.uint(1000000));
+
+      // Owner withdraws half
+      const withdrawResult = simnet.callPublicFn(
+        "amm",
+        "withdraw-treasury",
+        [Cl.uint(500000)],
+        deployer
+      );
+
+      expect(withdrawResult.result).toBeOk(Cl.bool(true));
+
+      // Check updated treasury balance
+      const newBalance = simnet.callReadOnlyFn(
+        "amm",
+        "get-treasury-balance",
+        [],
+        deployer
+      );
+      expect(newBalance.result).toBeOk(Cl.uint(500000));
+    });
+
+    it("should prevent non-owner from withdrawing treasury", () => {
+      createPool();
+
+      const withdrawResult = simnet.callPublicFn(
+        "amm",
+        "withdraw-treasury",
+        [Cl.uint(500000)],
+        alice // Not the owner
+      );
+
+      expect(withdrawResult.result).toBeErr(Cl.uint(209)); // ERR_NOT_CONTRACT_OWNER
+    });
+
+    it("should prevent withdrawing more than treasury balance", () => {
+      createPool();
+
+      const withdrawResult = simnet.callPublicFn(
+        "amm",
+        "withdraw-treasury",
+        [Cl.uint(2000000)], // More than 1 STX in treasury
+        deployer
+      );
+
+      expect(withdrawResult.result).toBeErr(Cl.uint(210)); // ERR_INSUFFICIENT_TREASURY_BALANCE
+    });
+
+    it("should return correct contract owner", () => {
+      const ownerResult = simnet.callReadOnlyFn(
+        "amm",
+        "get-contract-owner",
+        [],
+        alice
+      );
+
+      expect(ownerResult.result).toBeOk(Cl.principal(deployer));
+    });
   });
 });

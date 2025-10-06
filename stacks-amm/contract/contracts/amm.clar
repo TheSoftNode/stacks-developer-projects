@@ -6,6 +6,7 @@
 (define-constant MINIMUM_LIQUIDITY u1000) ;; minimum liquidity that must exist in a pool
 (define-constant THIS_CONTRACT (as-contract tx-sender)) ;; this contract
 (define-constant FEES_DENOM u10000) ;; fees denominator
+(define-constant POOL_CREATION_FEE u1000000) ;; 1 STX fee to create a pool
 
 ;; errors
 (define-constant ERR_POOL_ALREADY_EXISTS (err u200)) ;; pool already exists
@@ -17,6 +18,12 @@
 (define-constant ERR_INSUFFICIENT_LIQUIDITY_FOR_SWAP (err u206)) ;; insufficient liquidity in pool for swap
 (define-constant ERR_INSUFFICIENT_1_AMOUNT (err u207)) ;; insufficient amount of token 1 for swap
 (define-constant ERR_INSUFFICIENT_0_AMOUNT (err u208)) ;; insufficient amount of token 0 for swap
+(define-constant ERR_NOT_CONTRACT_OWNER (err u209)) ;; not contract owner
+(define-constant ERR_INSUFFICIENT_TREASURY_BALANCE (err u210)) ;; insufficient treasury balance
+
+;; data variables
+(define-data-var contract-owner principal tx-sender)
+(define-data-var treasury-balance uint u0)
 
 ;; mappings
 (define-map pools
@@ -110,11 +117,18 @@
             ERR_INCORRECT_TOKEN_ORDERING
         )
 
+        ;; Transfer pool creation fee from user to contract
+        (try! (stx-transfer? POOL_CREATION_FEE tx-sender (as-contract tx-sender)))
+
+        ;; Update treasury balance
+        (var-set treasury-balance (+ (var-get treasury-balance) POOL_CREATION_FEE))
+
         ;; Update the `pools` map with the new pool data
         (map-set pools pool-id pool-data)
         (print {
             action: "create-pool",
             data: pool-data,
+            fee-paid: POOL_CREATION_FEE,
         })
         (ok true)
     )
@@ -468,5 +482,34 @@
 (define-read-only (get-pool-data (pool-id (buff 20)))
     (let ((pool-data (map-get? pools pool-id)))
         (ok pool-data)
+    )
+)
+
+;; get-treasury-balance
+;; Returns the current treasury balance
+(define-read-only (get-treasury-balance)
+    (ok (var-get treasury-balance))
+)
+
+;; get-contract-owner
+;; Returns the contract owner
+(define-read-only (get-contract-owner)
+    (ok (var-get contract-owner))
+)
+
+;; withdraw-treasury
+;; Allows contract owner to withdraw from treasury
+(define-public (withdraw-treasury (amount uint))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_NOT_CONTRACT_OWNER)
+        (asserts! (<= amount (var-get treasury-balance)) ERR_INSUFFICIENT_TREASURY_BALANCE)
+        (try! (as-contract (stx-transfer? amount tx-sender (var-get contract-owner))))
+        (var-set treasury-balance (- (var-get treasury-balance) amount))
+        (print {
+            action: "withdraw-treasury",
+            amount: amount,
+            recipient: (var-get contract-owner),
+        })
+        (ok true)
     )
 )

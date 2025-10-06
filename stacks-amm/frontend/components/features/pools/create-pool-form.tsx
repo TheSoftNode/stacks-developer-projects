@@ -88,13 +88,13 @@ export function CreatePoolForm() {
             </div>
             <Input
               id="token0"
-              placeholder="ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.mock-token"
+              placeholder="ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.your-token"
               value={token0}
               onChange={(e) => setToken0(e.target.value)}
               className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
             />
             <p className="text-xs text-slate-500">
-              Enter the full token principal address
+              Enter any SIP-010 token principal address
             </p>
           </div>
 
@@ -102,13 +102,13 @@ export function CreatePoolForm() {
             <Label htmlFor="token1" className="text-slate-300">Token 1 (Principal)</Label>
             <Input
               id="token1"
-              placeholder="ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.mock-token-2"
+              placeholder="ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.your-token"
               value={token1}
               onChange={(e) => setToken1(e.target.value)}
               className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
             />
             <p className="text-xs text-slate-500">
-              Enter the full token principal address
+              Enter any SIP-010 token principal address
             </p>
           </div>
 
@@ -126,6 +126,21 @@ export function CreatePoolForm() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Pool Creation Fee Info */}
+          <div className="rounded-xl bg-teal-500/10 border border-teal-500/20 p-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-teal-500/20">
+                <Coins className="h-4 w-4 text-teal-400" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-teal-400 mb-1">Pool Creation Fee</h4>
+                <p className="text-xs text-slate-300">
+                  A one-time fee of <span className="font-bold text-teal-400">1 STX</span> is required to create a new pool. This fee helps support protocol development and maintenance.
+                </p>
+              </div>
+            </div>
           </div>
 
           <Button

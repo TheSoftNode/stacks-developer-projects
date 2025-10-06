@@ -8,7 +8,7 @@ cache_dir = './.cache'
 [[project.requirements]]
 contract_id = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard'
 
-[contracts.amm]
+[contracts.amm-v2]
 path = 'contracts/amm.clar'
 clarity_version = 3
 epoch = 3.1

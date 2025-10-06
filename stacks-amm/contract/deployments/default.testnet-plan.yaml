@@ -22,7 +22,7 @@ plan:
         - contract-publish:
             contract-name: mock-token-2
             expected-sender: ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7
-            cost: 11810
+            cost: 8828325649
             path: contracts/mock-token.clar
             anchor-block-only: true
             clarity-version: 2
@@ -30,16 +30,16 @@ plan:
     - id: 2
       transactions:
         - contract-publish:
-            contract-name: amm
+            contract-name: amm-v2
             expected-sender: ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7
-            cost: 184750
+            cost: 8971771994
             path: contracts/amm.clar
             anchor-block-only: true
             clarity-version: 3
         - contract-publish:
             contract-name: mock-token
             expected-sender: ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7
-            cost: 11810
+            cost: 8828325649
             path: contracts/mock-token.clar
             anchor-block-only: true
             clarity-version: 3

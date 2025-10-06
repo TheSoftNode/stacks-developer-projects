@@ -13,7 +13,7 @@ import {
 } from "@stacks/transactions";
 
 // REPLACE THESE WITH YOUR OWN
-const AMM_CONTRACT_ADDRESS = "ST3P49R8XXQWG69S66MZASYPTTGNDKK0WW32RRJDN";
+const AMM_CONTRACT_ADDRESS = "ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7";
 const AMM_CONTRACT_NAME = "amm";
 const AMM_CONTRACT_PRINCIPAL = `${AMM_CONTRACT_ADDRESS}.${AMM_CONTRACT_NAME}`;
 
@@ -338,4 +338,43 @@ export function getTokenName(tokenPrincipal: string): string {
 
 export function formatTokenAmount(amount: number, decimals: number = 6): string {
   return (amount / Math.pow(10, decimals)).toFixed(decimals);
+}
+
+// Mock token addresses
+export const MOCK_TOKEN_1 = `${AMM_CONTRACT_ADDRESS}.mock-token`;
+export const MOCK_TOKEN_2 = `${AMM_CONTRACT_ADDRESS}.mock-token-2`;
+
+export async function mintToken(tokenAddress: string, amount: number, recipient: string) {
+  const [contractAddress, contractName] = tokenAddress.split(".");
+
+  const txOptions = {
+    contractAddress,
+    contractName,
+    functionName: "mint",
+    functionArgs: [uintCV(amount), principalCV(recipient)],
+  };
+
+  return txOptions;
+}
+
+export async function getTokenBalance(tokenAddress: string, owner: string): Promise<number> {
+  try {
+    const [contractAddress, contractName] = tokenAddress.split(".");
+
+    const balanceResult = await fetchCallReadOnlyFunction({
+      contractAddress,
+      contractName,
+      functionName: "get-balance",
+      functionArgs: [principalCV(owner)],
+      senderAddress: contractAddress,
+      network: STACKS_TESTNET,
+    });
+
+    if (balanceResult.type !== "ok") return 0;
+    if (balanceResult.value.type !== "uint") return 0;
+    return parseInt(balanceResult.value.value.toString());
+  } catch (error) {
+    console.error("Error fetching token balance:", error);
+    return 0;
+  }
 }

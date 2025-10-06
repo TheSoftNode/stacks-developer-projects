@@ -6,9 +6,14 @@ import {
   Pool,
   removeLiquidity,
   swap,
+  mintToken,
+  getTokenBalance,
+  MOCK_TOKEN_1,
+  MOCK_TOKEN_2,
 } from "@/lib/amm";
 import { walletService } from "@/lib/wallet-service";
 import { PostConditionMode } from "@stacks/transactions";
+import { STACKS_TESTNET } from "@stacks/network";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -101,6 +106,7 @@ export function useStacks() {
       await openContractCall({
         ...options,
         appDetails,
+        network: STACKS_TESTNET, // Force testnet
         onFinish: (data: any) => {
           toast.success("Pool creation transaction submitted!", {
             description: `Transaction ID: ${data.txId.substring(0, 10)}...`,
@@ -141,6 +147,7 @@ export function useStacks() {
       await openContractCall({
         ...options,
         appDetails,
+        network: STACKS_TESTNET, // Force testnet
         onFinish: (data: any) => {
           toast.success("Swap transaction submitted!", {
             description: `Transaction ID: ${data.txId.substring(0, 10)}...`,
@@ -185,6 +192,7 @@ export function useStacks() {
       await openContractCall({
         ...options,
         appDetails,
+        network: STACKS_TESTNET, // Force testnet
         onFinish: (data: any) => {
           toast.success("Liquidity added successfully!", {
             description: `Transaction ID: ${data.txId.substring(0, 10)}...`,
@@ -225,6 +233,7 @@ export function useStacks() {
       await openContractCall({
         ...options,
         appDetails,
+        network: STACKS_TESTNET, // Force testnet
         onFinish: (data: any) => {
           toast.success("Liquidity removed successfully!", {
             description: `Transaction ID: ${data.txId.substring(0, 10)}...`,
@@ -247,6 +256,62 @@ export function useStacks() {
     }
   }
 
+  async function handleMintTokens(tokenAddress: string, amount: number) {
+    if (!userData) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    const address = userData.profile.stxAddress.testnet;
+
+    setIsLoading(true);
+    try {
+      const { openContractCall } = await import("@stacks/connect");
+      const options = await mintToken(tokenAddress, amount, address);
+      await openContractCall({
+        ...options,
+        appDetails,
+        network: STACKS_TESTNET, // Force testnet
+        onFinish: (data: any) => {
+          toast.success("Tokens minted successfully!", {
+            description: `Transaction ID: ${data.txId.substring(0, 10)}...`,
+          });
+          console.log(data);
+        },
+        onCancel: () => {
+          toast.info("Mint cancelled");
+        },
+        postConditionMode: PostConditionMode.Allow,
+      });
+    } catch (error) {
+      const err = error as Error;
+      console.error(err);
+      toast.error("Failed to mint tokens", {
+        description: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function checkTokenBalances() {
+    if (!userData) return { token1: 0, token2: 0 };
+
+    const address = userData.profile.stxAddress.testnet;
+
+    try {
+      const [balance1, balance2] = await Promise.all([
+        getTokenBalance(MOCK_TOKEN_1, address),
+        getTokenBalance(MOCK_TOKEN_2, address),
+      ]);
+
+      return { token1: balance1, token2: balance2 };
+    } catch (error) {
+      console.error("Error checking balances:", error);
+      return { token1: 0, token2: 0 };
+    }
+  }
+
   return {
     userData,
     isLoading,
@@ -254,6 +319,8 @@ export function useStacks() {
     handleSwap,
     handleAddLiquidity,
     handleRemoveLiquidity,
+    handleMintTokens,
+    checkTokenBalances,
     connectWallet,
     disconnectWallet,
   };

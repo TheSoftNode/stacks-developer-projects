@@ -79,7 +79,9 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
               <div className="flex justify-between">
                 <span className="text-slate-400">Current Ratio</span>
                 <span className="font-medium text-white">
-                  1 : {(selectedPool["balance-1"] / selectedPool["balance-0"]).toFixed(4)}
+                  {selectedPool["balance-0"] === 0 || selectedPool["balance-1"] === 0
+                    ? "No liquidity yet"
+                    : `1 : ${(selectedPool["balance-1"] / selectedPool["balance-0"]).toFixed(4)}`}
                 </span>
               </div>
             </div>

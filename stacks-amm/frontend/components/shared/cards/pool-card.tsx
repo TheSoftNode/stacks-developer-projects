@@ -73,7 +73,7 @@ export function PoolCard({ pool, userLiquidity }: PoolCardProps) {
         )}
 
         <Button asChild className="w-full bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all group">
-          <Link href={`/pools/${pool.id}`}>
+          <Link href={`/dashboard/pools/${pool.id}`}>
             Manage Pool
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>

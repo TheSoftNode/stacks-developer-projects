@@ -9,16 +9,19 @@ export function abbreviateTxnId(txnId: string): string {
 }
 
 export function formatNumber(num: number, decimals: number = 2): string {
-  if (num >= 1_000_000_000) {
-    return `${(num / 1_000_000_000).toFixed(decimals)}B`;
+  // Convert from smallest units (6 decimals for our tokens) to human-readable
+  const humanReadable = num / 1_000_000; // Adjust for 6 decimal places
+
+  if (humanReadable >= 1_000_000_000) {
+    return `${(humanReadable / 1_000_000_000).toFixed(decimals)}B`;
   }
-  if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(decimals)}M`;
+  if (humanReadable >= 1_000_000) {
+    return `${(humanReadable / 1_000_000).toFixed(decimals)}M`;
   }
-  if (num >= 1_000) {
-    return `${(num / 1_000).toFixed(decimals)}K`;
+  if (humanReadable >= 1_000) {
+    return `${(humanReadable / 1_000).toFixed(decimals)}K`;
   }
-  return num.toFixed(decimals);
+  return humanReadable.toFixed(decimals);
 }
 
 export function formatCurrency(num: number, currency: string = "STX"): string {

@@ -1,5 +1,5 @@
 ;; traits
-(use-trait ft-trait 'ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;
@@ -121,7 +121,9 @@
         (try! (stx-transfer? POOL_CREATION_FEE tx-sender (as-contract tx-sender)))
 
         ;; Update treasury balance
-        (var-set treasury-balance (+ (var-get treasury-balance) POOL_CREATION_FEE))
+        (var-set treasury-balance
+            (+ (var-get treasury-balance) POOL_CREATION_FEE)
+        )
 
         ;; Update the `pools` map with the new pool data
         (map-set pools pool-id pool-data)
@@ -501,8 +503,12 @@
 ;; Allows contract owner to withdraw from treasury
 (define-public (withdraw-treasury (amount uint))
     (begin
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR_NOT_CONTRACT_OWNER)
-        (asserts! (<= amount (var-get treasury-balance)) ERR_INSUFFICIENT_TREASURY_BALANCE)
+        (asserts! (is-eq tx-sender (var-get contract-owner))
+            ERR_NOT_CONTRACT_OWNER
+        )
+        (asserts! (<= amount (var-get treasury-balance))
+            ERR_INSUFFICIENT_TREASURY_BALANCE
+        )
         (try! (as-contract (stx-transfer? amount tx-sender (var-get contract-owner))))
         (var-set treasury-balance (- (var-get treasury-balance) amount))
         (print {

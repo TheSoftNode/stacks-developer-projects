@@ -15,7 +15,7 @@ import { fetchCallReadOnlyFunction } from "@stacks/transactions";
 import { STACKS_TESTNET } from "@stacks/network";
 
 const AMM_CONTRACT_ADDRESS = "ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7";
-const AMM_CONTRACT_NAME = "amm-v3";
+const AMM_CONTRACT_NAME = "amm-v4";
 
 export default function PoolsPage() {
   const { userData } = useStacks();

@@ -6,15 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Coins, Download, Shield } from "lucide-react";
-import { fetchCallReadOnlyFunction, cvToValue } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction, cvToValue, uintCV, Pc } from "@stacks/transactions";
 import { STACKS_TESTNET } from "@stacks/network";
 import { useStacks } from "@/hooks/use-stacks";
 import { openContractCall } from "@stacks/connect";
 import { toast } from "sonner";
-import { uintCV } from "@stacks/transactions";
 
 const AMM_CONTRACT_ADDRESS = "ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7";
-const AMM_CONTRACT_NAME = "amm-v3";
+const AMM_CONTRACT_NAME = "amm-v4";
 
 export function TreasuryCard() {
   const { userData } = useStacks();
@@ -83,8 +82,11 @@ export function TreasuryCard() {
         network: STACKS_TESTNET,
       });
 
-      if (ownerResult.type === "ok" && (ownerResult.value.type === "principal" || ownerResult.value.type === "address")) {
-        setContractOwner(ownerResult.value.value);
+      if (ownerResult.type === "ok") {
+        const ownerValue: any = ownerResult.value;
+        if (ownerValue.type === "principal" || ownerValue.type === "address") {
+          setContractOwner(ownerValue.value);
+        }
       }
     } catch (error) {
       console.error("Error fetching treasury data:", error);
@@ -114,8 +116,11 @@ export function TreasuryCard() {
         contractName: AMM_CONTRACT_NAME,
         functionName: "withdraw-treasury",
         functionArgs: [uintCV(microAmount)],
+        postConditionMode: 0x01, // Allow mode - bypass automatic post-conditions
         network: STACKS_TESTNET,
         onFinish: (data) => {
+          console.log("🔗 Withdrawal Transaction ID:", data.txId);
+          console.log("🔍 View in explorer:", `https://explorer.hiro.so/txid/${data.txId}?chain=testnet`);
           toast.success("Withdrawal submitted!", {
             description: `Transaction ID: ${data.txId}`,
           });

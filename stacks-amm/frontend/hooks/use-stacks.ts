@@ -10,6 +10,8 @@ import {
   getTokenBalance,
   MOCK_TOKEN_1,
   MOCK_TOKEN_2,
+  MOCK_TOKEN_3,
+  MOCK_TOKEN_4,
 } from "@/lib/amm";
 import { walletService } from "@/lib/wallet-service";
 import { PostConditionMode } from "@stacks/transactions";
@@ -34,8 +36,9 @@ export function useStacks() {
 
       // Check if wallet was previously connected
       walletService.getCurrentWalletData().then((walletData) => {
+        console.log("Initial wallet data check:", walletData);
         if (walletData) {
-          setUserData({
+          const newUserData = {
             profile: {
               stxAddress: {
                 testnet: walletData.address,
@@ -43,7 +46,10 @@ export function useStacks() {
               },
             },
             publicKey: walletData.publicKey,
-          });
+            address: walletData.address, // Add direct address too
+          };
+          console.log("✅ Setting userData in useStacks:", newUserData);
+          setUserData(newUserData);
         }
       });
     }
@@ -87,6 +93,11 @@ export function useStacks() {
       await walletService.disconnectWallet();
       setUserData(null);
       toast.success("Wallet disconnected");
+
+      // Redirect to home page after disconnect
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Disconnect wallet error:", error);
       toast.error("Failed to disconnect wallet");
@@ -295,20 +306,22 @@ export function useStacks() {
   }
 
   async function checkTokenBalances() {
-    if (!userData) return { token1: 0, token2: 0 };
+    if (!userData) return { token1: 0, token2: 0, token3: 0, token4: 0 };
 
     const address = userData.profile.stxAddress.testnet;
 
     try {
-      const [balance1, balance2] = await Promise.all([
+      const [balance1, balance2, balance3, balance4] = await Promise.all([
         getTokenBalance(MOCK_TOKEN_1, address),
         getTokenBalance(MOCK_TOKEN_2, address),
+        getTokenBalance(MOCK_TOKEN_3, address),
+        getTokenBalance(MOCK_TOKEN_4, address),
       ]);
 
-      return { token1: balance1, token2: balance2 };
+      return { token1: balance1, token2: balance2, token3: balance3, token4: balance4 };
     } catch (error) {
       console.error("Error checking balances:", error);
-      return { token1: 0, token2: 0 };
+      return { token1: 0, token2: 0, token3: 0, token4: 0 };
     }
   }
 

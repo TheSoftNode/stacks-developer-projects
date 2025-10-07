@@ -13,6 +13,16 @@ path = 'contracts/amm.clar'
 clarity_version = 3
 epoch = 3.1
 
+[contracts.amm-v3]
+path = 'contracts/amm.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.amm-v4]
+path = 'contracts/amm.clar'
+clarity_version = 3
+epoch = 3.1
+
 [contracts.mock-token]
 path = 'contracts/mock-token.clar'
 clarity_version = 3
@@ -22,6 +32,16 @@ epoch = 3.1
 path = 'contracts/mock-token.clar'
 clarity_version = 2
 epoch = 3.0
+
+[contracts.mock-token-3]
+path = 'contracts/mock-token.clar'
+clarity_version = 3
+epoch = 3.1
+
+[contracts.mock-token-4]
+path = 'contracts/mock-token.clar'
+clarity_version = 3
+epoch = 3.1
 
 [repl.analysis]
 passes = ['check_checker']

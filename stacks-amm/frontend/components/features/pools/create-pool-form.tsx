@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStacks } from "@/hooks/use-stacks";
-import { MOCK_TOKEN_1, MOCK_TOKEN_2 } from "@/lib/amm";
+import { MOCK_TOKEN_1, MOCK_TOKEN_2, MOCK_TOKEN_3, MOCK_TOKEN_4 } from "@/lib/amm";
 import { MintTokensModal } from "@/components/features/tokens/mint-tokens-modal";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
@@ -22,8 +22,8 @@ export function CreatePoolForm() {
     if (!token0 || !token1 || !fee) return;
 
     // Check if user has tokens before creating pool (only for mock tokens)
-    if ((token0 === MOCK_TOKEN_1 || token0 === MOCK_TOKEN_2) &&
-        (token1 === MOCK_TOKEN_1 || token1 === MOCK_TOKEN_2)) {
+    const mockTokens = [MOCK_TOKEN_1, MOCK_TOKEN_2, MOCK_TOKEN_3, MOCK_TOKEN_4];
+    if (mockTokens.includes(token0) && mockTokens.includes(token1)) {
       const balances = await checkTokenBalances();
       if (balances.token1 === 0 || balances.token2 === 0) {
         toast.error("No test tokens found", {

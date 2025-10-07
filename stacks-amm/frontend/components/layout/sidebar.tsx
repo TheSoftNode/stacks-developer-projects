@@ -68,15 +68,37 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div
-      className={cn(
-        "relative flex flex-col border-r border-slate-800/50 bg-slate-950 transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
-        className
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-slate-900 border border-slate-700 text-white"
+      >
+        <Layers className="h-6 w-6" />
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
-    >
+
+      {/* Sidebar */}
+      <div
+        className={cn(
+          "relative flex flex-col border-r border-slate-800/50 bg-slate-950 transition-all duration-300",
+          "md:relative md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          collapsed ? "w-16" : "w-64",
+          className
+        )}
+      >
       {/* Collapse Button */}
       <Button
         variant="ghost"
@@ -148,5 +170,6 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
       )}
     </div>
+    </>
   );
 }

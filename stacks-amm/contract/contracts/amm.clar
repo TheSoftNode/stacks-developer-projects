@@ -1,5 +1,5 @@
 ;; traits
-(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait ft-trait 'ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; constants
 ;;

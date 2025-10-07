@@ -60,11 +60,11 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
   };
 
   const estimatedToken0 = selectedPool && liquidityAmount
-    ? (parseFloat(liquidityAmount) / selectedPool.liquidity) * selectedPool["balance-0"]
+    ? ((parseFloat(liquidityAmount) / selectedPool.liquidity) * selectedPool["balance-0"]) / 1_000_000
     : 0;
 
   const estimatedToken1 = selectedPool && liquidityAmount
-    ? (parseFloat(liquidityAmount) / selectedPool.liquidity) * selectedPool["balance-1"]
+    ? ((parseFloat(liquidityAmount) / selectedPool.liquidity) * selectedPool["balance-1"]) / 1_000_000
     : 0;
 
   return (
@@ -140,18 +140,6 @@ export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
                     </Button>
                   ))}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-slate-300">Liquidity Amount</Label>
-                <Input
-                  type="number"
-                  placeholder="0.0"
-                  value={liquidityAmount}
-                  onChange={(e) => setLiquidityAmount(e.target.value)}
-                  max={userLiquidity}
-                  className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
-                />
               </div>
             </div>
 

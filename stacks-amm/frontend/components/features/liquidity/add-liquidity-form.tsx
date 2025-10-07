@@ -34,10 +34,14 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
 
   const handleSubmit = async () => {
     if (!selectedPool || !amount0 || !amount1) return;
+    // Convert from user-friendly tokens to micro-units (6 decimals)
+    const microAmount0 = Math.floor(parseFloat(amount0) * 1_000_000);
+    const microAmount1 = Math.floor(parseFloat(amount1) * 1_000_000);
+
     await handleAddLiquidity(
       selectedPool,
-      parseFloat(amount0),
-      parseFloat(amount1)
+      microAmount0,
+      microAmount1
     );
     // Reset form
     setAmount0("");
@@ -90,13 +94,14 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
               <Label className="text-slate-300">{getTokenName(selectedPool["token-0"])} Amount</Label>
               <Input
                 type="number"
+                step="0.000001"
                 placeholder="0.0"
                 value={amount0}
                 onChange={(e) => setAmount0(e.target.value)}
                 className="border-slate-700 bg-slate-900/50 text-white placeholder:text-slate-500 focus:border-orange-500/30"
               />
               <p className="text-xs text-slate-500">
-                Available: {formatNumber(selectedPool["balance-0"])}
+                Enter amount in tokens (e.g., 100 for 100 tokens)
               </p>
             </div>
 
@@ -104,6 +109,7 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
               <Label className="text-slate-300">{getTokenName(selectedPool["token-1"])} Amount</Label>
               <Input
                 type="number"
+                step="0.000001"
                 placeholder="0.0"
                 value={amount1}
                 onChange={(e) => setAmount1(e.target.value)}
@@ -113,7 +119,7 @@ export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
               <p className="text-xs text-slate-500">
                 {selectedPool.liquidity > 0
                   ? "Amount calculated based on pool ratio"
-                  : "Initial liquidity - enter any amount"}
+                  : "Enter amount in tokens (e.g., 100 for 100 tokens)"}
               </p>
             </div>
           </>

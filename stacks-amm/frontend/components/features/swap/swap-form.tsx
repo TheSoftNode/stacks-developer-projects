@@ -65,11 +65,12 @@ export function SwapForm({ pools }: SwapFormProps) {
 
   const handleSwapClick = async () => {
     if (!selectedPool || !fromAmount || parseFloat(fromAmount) <= 0) return;
-    
-    const amount = parseFloat(fromAmount);
+
+    // Convert from user-friendly tokens to micro-units (6 decimals)
+    const microAmount = Math.floor(parseFloat(fromAmount) * 1_000_000);
     const zeroForOne = fromToken === selectedPool["token-0"];
-    
-    await handleSwap(selectedPool, amount, zeroForOne);
+
+    await handleSwap(selectedPool, microAmount, zeroForOne);
   };
 
   const handleSwapDirection = () => {

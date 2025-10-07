@@ -14,7 +14,7 @@ import {
 
 // REPLACE THESE WITH YOUR OWN
 const AMM_CONTRACT_ADDRESS = "ST2F3J1PK46D6XVRBB9SQ66PY89P8G0EBDW5E05M7";
-const AMM_CONTRACT_NAME = "amm-v2";
+const AMM_CONTRACT_NAME = "amm-v3";
 const AMM_CONTRACT_PRINCIPAL = `${AMM_CONTRACT_ADDRESS}.${AMM_CONTRACT_NAME}`;
 
 type ContractEvent = {
@@ -159,9 +159,10 @@ export async function getAllPools(): Promise<Pool[]> {
         };
 
         pools.push(pool);
-
-        offset = event.event_index;
       }
+
+      // Increment offset by the number of events fetched, not by event index
+      offset += events.length;
     } catch (error) {
       console.error("Error fetching pools:", error);
       done = true;
@@ -343,6 +344,8 @@ export function formatTokenAmount(amount: number, decimals: number = 6): string 
 // Mock token addresses
 export const MOCK_TOKEN_1 = `${AMM_CONTRACT_ADDRESS}.mock-token`;
 export const MOCK_TOKEN_2 = `${AMM_CONTRACT_ADDRESS}.mock-token-2`;
+export const MOCK_TOKEN_3 = `${AMM_CONTRACT_ADDRESS}.mock-token-3`;
+export const MOCK_TOKEN_4 = `${AMM_CONTRACT_ADDRESS}.mock-token-4`;
 
 export async function mintToken(tokenAddress: string, amount: number, recipient: string) {
   const [contractAddress, contractName] = tokenAddress.split(".");

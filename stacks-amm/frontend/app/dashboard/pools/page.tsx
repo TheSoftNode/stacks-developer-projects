@@ -76,20 +76,27 @@ export default function PoolsPage() {
 
       console.log("📦 Owner result:", ownerResult);
       console.log("📦 Owner result.type:", ownerResult.type);
-      console.log("📦 Owner result.value:", ownerResult.value);
-      console.log("📦 Owner result.value.type:", ownerResult.value?.type);
+      
+      // Type guard to check if the result has a value property
+      if (ownerResult.type === "ok" && 'value' in ownerResult) {
+        console.log("📦 Owner result.value:", ownerResult.value);
+        console.log("📦 Owner result.value.type:", 'type' in ownerResult.value ? ownerResult.value.type : 'unknown');
 
-      if (ownerResult.type === "ok" && (ownerResult.value.type === "principal" || ownerResult.value.type === "address")) {
-        const contractOwner = ownerResult.value.value;
-        // Try different possible address paths from wallet data
-        const userAddress = userData.profile?.stxAddress?.testnet ||
-                           userData.addresses?.stx?.[0]?.address ||
-                           userData.address;
-        console.log("✅ Contract Owner:", contractOwner);
-        console.log("✅ User Address:", userAddress);
-        console.log("✅ Full userData:", userData);
-        console.log("✅ Is Owner:", userAddress === contractOwner);
-        setIsOwner(userAddress === contractOwner);
+        if ('type' in ownerResult.value && 'value' in ownerResult.value) {
+          const contractOwner = ownerResult.value.value as string;
+          // Try different possible address paths from wallet data
+          const userAddress = userData.profile?.stxAddress?.testnet ||
+                             userData.addresses?.stx?.[0]?.address ||
+                             userData.address;
+          console.log("✅ Contract Owner:", contractOwner);
+          console.log("✅ User Address:", userAddress);
+          console.log("✅ Full userData:", userData);
+          console.log("✅ Is Owner:", userAddress === contractOwner);
+          setIsOwner(userAddress === contractOwner);
+        } else {
+          console.log("❌ Invalid owner result value type:", ownerResult.value);
+          setIsOwner(false);
+        }
       } else {
         console.log("❌ Invalid owner result type:", ownerResult);
         setIsOwner(false);

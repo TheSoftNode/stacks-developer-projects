@@ -51,6 +51,7 @@ AUTO_SYNC_ENABLED=true
 ### Option 1: Deploy via Vercel Dashboard (Easiest)
 
 1. **Push your code to GitHub**
+
    ```bash
    git add .
    git commit -m "Prepare for Vercel deployment"
@@ -58,12 +59,14 @@ AUTO_SYNC_ENABLED=true
    ```
 
 2. **Import your repository to Vercel**
+
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "Add New Project"
    - Import your GitHub repository
    - Vercel will auto-detect Next.js
 
 3. **Configure Environment Variables**
+
    - In the import screen, add all required environment variables
    - Click "Deploy"
 
@@ -75,21 +78,25 @@ AUTO_SYNC_ENABLED=true
 ### Option 2: Deploy via Vercel CLI
 
 1. **Install Vercel CLI** (if not already installed)
+
    ```bash
    npm install -g vercel
    ```
 
 2. **Login to Vercel**
+
    ```bash
    vercel login
    ```
 
 3. **Deploy to production**
+
    ```bash
    vercel --prod
    ```
 
 4. **Add environment variables**
+
    ```bash
    vercel env add MONGODB_URI
    vercel env add JWT_SECRET
@@ -105,14 +112,17 @@ AUTO_SYNC_ENABLED=true
 ## Setting Up MongoDB Atlas (Recommended)
 
 1. **Create a free MongoDB Atlas account**
+
    - Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
    - Click "Start Free"
 
 2. **Create a cluster**
+
    - Choose the free tier (M0)
    - Select a region close to your Vercel deployment region
 
 3. **Get your connection string**
+
    - Click "Connect" on your cluster
    - Choose "Connect your application"
    - Copy the connection string
@@ -160,16 +170,19 @@ AUTO_SYNC_ENABLED=true
 ## Troubleshooting
 
 ### Build Fails
+
 - Check Node.js version compatibility (should be 18.x or higher)
 - Ensure all dependencies are in `package.json`
 - Check build logs in Vercel dashboard
 
 ### Runtime Errors
+
 - Verify all environment variables are set
 - Check MongoDB connection string format
 - Review function logs in Vercel dashboard
 
 ### Scheduler Not Working
+
 - Ensure `AUTO_SYNC_ENABLED=true` is set
 - Check function execution time limits (Vercel Free: 10s, Pro: 60s)
 - Consider using Vercel Cron Jobs for scheduled tasks
@@ -185,6 +198,7 @@ AUTO_SYNC_ENABLED=true
 ## Scaling Considerations
 
 - **Vercel Free Tier Limits:**
+
   - 100GB bandwidth/month
   - 100,000 function invocations/month
   - 10s function execution time
@@ -197,6 +211,7 @@ AUTO_SYNC_ENABLED=true
 ## Support
 
 For issues with:
+
 - **Vercel deployment:** [Vercel Support](https://vercel.com/support)
 - **MongoDB Atlas:** [MongoDB Support](https://www.mongodb.com/support)
 - **Application bugs:** Create an issue in your GitHub repository

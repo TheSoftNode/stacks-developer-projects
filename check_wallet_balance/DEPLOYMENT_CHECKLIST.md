@@ -1,6 +1,7 @@
 # Pre-Deployment Checklist
 
 ## ✅ Completed
+
 - [x] Build passes without errors
 - [x] All TypeScript errors fixed
 - [x] Pino-pretty dependency installed
@@ -13,6 +14,7 @@
 ## 🔧 Required Before Deploying
 
 ### 1. Environment Variables Setup
+
 - [ ] MONGODB_URI - Get from MongoDB Atlas
 - [ ] JWT_SECRET - Generate strong 32+ character secret
 - [ ] ENCRYPTION_KEY - Generate 32 character encryption key
@@ -24,6 +26,7 @@
 - [ ] NEXT_PUBLIC_STACKS_NETWORK - mainnet or testnet
 
 ### 2. MongoDB Atlas Setup
+
 - [ ] Create MongoDB Atlas account
 - [ ] Create a free M0 cluster
 - [ ] Create database user
@@ -31,11 +34,13 @@
 - [ ] Whitelist Vercel IPs (0.0.0.0/0 for simplicity, or Vercel's specific IPs)
 
 ### 3. Email Setup (Gmail)
+
 - [ ] Enable 2-Factor Authentication on Google account
 - [ ] Generate App Password (Google Account > Security > App passwords)
 - [ ] Test email sending locally first (optional but recommended)
 
 ### 4. Code Preparation
+
 - [ ] Commit all changes to git
 - [ ] Push to GitHub repository
 - [ ] Ensure .env.local is in .gitignore (already done)
@@ -43,6 +48,7 @@
 ## 🚀 Deployment Steps
 
 ### Via Vercel Dashboard
+
 1. [ ] Go to https://vercel.com/new
 2. [ ] Import your GitHub repository
 3. [ ] Add all environment variables in the deployment screen
@@ -53,6 +59,7 @@
 8. [ ] Redeploy to apply URL changes
 
 ### Via Vercel CLI
+
 1. [ ] Install Vercel CLI: `npm install -g vercel`
 2. [ ] Login: `vercel login`
 3. [ ] Deploy: `vercel --prod`
@@ -62,6 +69,7 @@
 ## ✨ Post-Deployment Testing
 
 ### Authentication Tests
+
 - [ ] Test email/password registration
 - [ ] Test email/password login
 - [ ] Test wallet-only registration
@@ -71,6 +79,7 @@
 - [ ] Test logout
 
 ### Wallet Features
+
 - [ ] Add a wallet address
 - [ ] Check wallet balance display
 - [ ] Test transaction sync
@@ -78,6 +87,7 @@
 - [ ] Test encrypted wallet storage
 
 ### Dashboard Features
+
 - [ ] Test analytics page loads correctly
 - [ ] Test wallets page CRUD operations
 - [ ] Test settings page saves correctly
@@ -85,11 +95,13 @@
 - [ ] Test users page (admin features)
 
 ### Public Features
+
 - [ ] Test wallet checker page (public wallet lookup)
 - [ ] Test docs page loads
 - [ ] Test home page
 
 ### Scheduler & Notifications
+
 - [ ] Verify auto-update scheduler initializes
 - [ ] Test manual balance update trigger
 - [ ] Test email notifications send correctly
@@ -114,26 +126,31 @@
 ## 🐛 Common Issues & Solutions
 
 ### Build Fails
+
 - Check that all dependencies are in package.json
 - Ensure Node.js version is 18.x or higher
 - Review build logs in Vercel dashboard
 
 ### Can't Connect to MongoDB
+
 - Verify connection string format
 - Check MongoDB Atlas IP whitelist
 - Ensure database user has correct permissions
 
 ### Email Not Sending
+
 - Verify Gmail app password is correct
 - Check EMAIL_HOST and EMAIL_PORT values
 - Ensure 2FA is enabled on Google account
 
 ### Scheduler Not Running
+
 - Set AUTO_SYNC_ENABLED=true
 - Check Vercel function execution logs
 - Consider function execution time limits
 
 ### Authentication Issues
+
 - Ensure NEXTAUTH_URL matches your domain
 - Check JWT_SECRET is set
 - Verify cookies are being set correctly

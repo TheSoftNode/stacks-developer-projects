@@ -60,15 +60,15 @@ export async function getTokenInfo(tokenAddress: string): Promise<TokenInfo> {
     let symbol = "";
     let decimals = 6; // default
 
-    if (nameResult.type === "ok" && nameResult.value.type === "string-ascii") {
-      name = nameResult.value.data;
+    if (nameResult.type === "ok" && 'value' in nameResult && 'data' in nameResult.value) {
+      name = nameResult.value.data as string;
     }
 
-    if (symbolResult.type === "ok" && symbolResult.value.type === "string-ascii") {
-      symbol = symbolResult.value.data;
+    if (symbolResult.type === "ok" && 'value' in symbolResult && 'data' in symbolResult.value) {
+      symbol = symbolResult.value.data as string;
     }
 
-    if (decimalsResult.type === "ok" && decimalsResult.value.type === "uint") {
+    if (decimalsResult.type === "ok" && 'value' in decimalsResult && 'value' in decimalsResult.value) {
       decimals = parseInt(decimalsResult.value.value.toString());
     }
 

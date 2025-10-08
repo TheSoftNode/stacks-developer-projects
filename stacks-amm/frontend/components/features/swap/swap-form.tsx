@@ -14,9 +14,10 @@ import { useStacks } from "@/hooks/use-stacks";
 
 interface SwapFormProps {
   pools: Pool[];
+  preselectedPool?: Pool;
 }
 
-export function SwapForm({ pools }: SwapFormProps) {
+export function SwapForm({ pools, preselectedPool }: SwapFormProps) {
   const { handleSwap, isLoading, userData } = useStacks();
   const [fromToken, setFromToken] = useState<string>("");
   const [toToken, setToToken] = useState<string>("");
@@ -24,6 +25,14 @@ export function SwapForm({ pools }: SwapFormProps) {
   const [slippage, setSlippage] = useState<number>(0.5);
   const [quote, setQuote] = useState<SwapQuote | null>(null);
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
+
+  // Initialize tokens if preselectedPool is provided
+  useEffect(() => {
+    if (preselectedPool && !fromToken && !toToken) {
+      setFromToken(preselectedPool["token-0"]);
+      setToToken(preselectedPool["token-1"]);
+    }
+  }, [preselectedPool, fromToken, toToken]);
 
   // Get unique tokens from all pools
   const uniqueTokens = Array.from(

@@ -13,13 +13,21 @@ import { formatNumber } from "@/lib/stx-utils";
 
 interface AddLiquidityFormProps {
   pools: Pool[];
+  preselectedPool?: Pool;
 }
 
-export function AddLiquidityForm({ pools }: AddLiquidityFormProps) {
+export function AddLiquidityForm({ pools, preselectedPool }: AddLiquidityFormProps) {
   const { handleAddLiquidity, isLoading, userData } = useStacks();
   const [selectedPoolId, setSelectedPoolId] = useState<string>("");
   const [amount0, setAmount0] = useState<string>("");
   const [amount1, setAmount1] = useState<string>("");
+
+  // Initialize with preselected pool if provided
+  useEffect(() => {
+    if (preselectedPool && !selectedPoolId) {
+      setSelectedPoolId(preselectedPool.id);
+    }
+  }, [preselectedPool, selectedPoolId]);
   
   const selectedPool = pools.find((p) => p.id === selectedPoolId);
 

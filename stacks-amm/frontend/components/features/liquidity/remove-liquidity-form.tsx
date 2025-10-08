@@ -14,27 +14,43 @@ import { formatNumber, calculateSharePercentage } from "@/lib/stx-utils";
 
 interface RemoveLiquidityFormProps {
   pools: Pool[];
+  preselectedPool?: Pool;
+  userLiquidity?: number;
 }
 
-export function RemoveLiquidityForm({ pools }: RemoveLiquidityFormProps) {
+export function RemoveLiquidityForm({ pools, preselectedPool, userLiquidity: initialUserLiquidity }: RemoveLiquidityFormProps) {
   const { handleRemoveLiquidity, isLoading, userData } = useStacks();
   const [selectedPoolId, setSelectedPoolId] = useState<string>("");
   const [liquidityAmount, setLiquidityAmount] = useState<string>("");
   const [liquidityPercentage, setLiquidityPercentage] = useState<number>(0);
-  const [userLiquidity, setUserLiquidity] = useState<number>(0);
+  const [userLiquidity, setUserLiquidity] = useState<number>(initialUserLiquidity || 0);
+
+  // Initialize with preselected pool if provided
+  useEffect(() => {
+    if (preselectedPool && !selectedPoolId) {
+      setSelectedPoolId(preselectedPool.id);
+    }
+  }, [preselectedPool, selectedPoolId]);
+
+  // Update userLiquidity when initialUserLiquidity changes
+  useEffect(() => {
+    if (initialUserLiquidity !== undefined) {
+      setUserLiquidity(initialUserLiquidity);
+    }
+  }, [initialUserLiquidity]);
   
   const selectedPool = pools.find((p) => p.id === selectedPoolId);
 
-  // Fetch user's liquidity for selected pool
+  // Fetch user's liquidity for selected pool only if not provided
   useEffect(() => {
-    if (selectedPool && userData) {
+    if (selectedPool && userData && !initialUserLiquidity) {
       getUserLiquidity(selectedPool, userData.profile.stxAddress.testnet).then(
         (liquidity) => {
           setUserLiquidity(liquidity);
         }
       );
     }
-  }, [selectedPool, userData]);
+  }, [selectedPool, userData, initialUserLiquidity]);
 
   // Update percentage when amount changes
   useEffect(() => {

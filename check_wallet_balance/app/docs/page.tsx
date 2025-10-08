@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Header } from "@/components/Header";
+export const dynamic = 'force-dynamic';
+
+import { useState, useRef } from "react";
+import { Header, HeaderRef } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AuthModal } from "@/components/AuthModal";
 import { DocsNavigation } from "@/components/docs/DocsNavigation";
@@ -14,8 +16,6 @@ import { FAQ } from "@/components/docs/sections/FAQ";
 import { TechnicalDetails } from "@/components/docs/sections/TechnicalDetails";
 import { ContactSupport } from "@/components/docs/sections/ContactSupport";
 import { motion } from "framer-motion";
-import { useRef } from "react";
-import { HeaderRef } from "@/components/Header";
 
 export default function DocsPage() {
   const [activeSection, setActiveSection] = useState('getting-started');

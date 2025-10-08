@@ -6,7 +6,7 @@ import { getTokenFromRequest, verifyToken } from '@/lib/auth';
 // DELETE: Remove wallet
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -22,9 +22,12 @@ export async function DELETE(
 
     await connectDB();
 
+    // Await params in Next.js 15
+    const { id } = await params;
+
     // Find and verify wallet ownership
     const wallet = await Wallet.findOne({
-      _id: params.id,
+      _id: id,
       userId: payload.userId,
       isActive: true
     });
@@ -47,7 +50,7 @@ export async function DELETE(
 // PUT: Update wallet
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -69,9 +72,12 @@ export async function PUT(
 
     await connectDB();
 
+    // Await params in Next.js 15
+    const { id } = await params;
+
     // Find and verify wallet ownership
     const wallet = await Wallet.findOne({
-      _id: params.id,
+      _id: id,
       userId: payload.userId,
       isActive: true
     });

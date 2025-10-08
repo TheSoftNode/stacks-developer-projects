@@ -3,7 +3,7 @@ import { User } from '@/models';
 import connectDB from '@/lib/db';
 import { verifyWalletSignature } from '@/lib/wallet-auth';
 import { getTokenFromRequest, verifyToken } from '@/lib/auth';
-import { getChallenge, removeChallenge } from '../wallet/challenge/route';
+import { getChallenge, removeChallenge } from '@/lib/challenge-helpers';
 
 export async function POST(request: NextRequest) {
   try {

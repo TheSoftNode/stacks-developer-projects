@@ -463,7 +463,8 @@ export async function POST(request: NextRequest) {
               console.log(`✅ Successfully saved transaction ${apiTx.tx_id} for wallet ${wallet._id}`);
               
             } catch (error) {
-              if (error.code === 11000) {
+              // Type guard for MongoDB duplicate key error
+              if (error && typeof error === 'object' && 'code' in error && error.code === 11000) {
                 console.log(`⚠️ Transaction ${apiTx.tx_id} already exists for wallet ${wallet._id} - skipping`);
                 // This is fine, the transaction was already processed for this wallet
               } else {

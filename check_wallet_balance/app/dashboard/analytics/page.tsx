@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,18 +20,11 @@ import { Label } from "@/components/ui/label";
 import { 
   LineChart,
   Line,
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
   Legend,
 } from 'recharts';
 import { 
@@ -104,7 +99,6 @@ export default function AnalyticsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [groupBy, setGroupBy] = useState<'wallet' | 'date' | 'type'>('wallet');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
 
   useEffect(() => {
@@ -286,7 +280,10 @@ export default function AnalyticsPage() {
       console.log(`🔍 Processing ${filtered.length} filtered transactions...`);
       
       filtered.forEach((tx, index) => {
-        const key = tx.walletId._id || tx.walletId; // Handle both populated and unpopulated cases
+        // Ensure key is always a string
+        const key = typeof tx.walletId === 'string' 
+          ? tx.walletId 
+          : tx.walletId._id || '';
         
         if (index < 3) { // Debug first few transactions
           console.log(`🔍 Transaction ${index + 1}:`, {
@@ -299,7 +296,7 @@ export default function AnalyticsPage() {
           });
         }
         
-        if (grouped[key]) {
+        if (key && grouped[key]) {
           grouped[key].transactions.push(tx);
           grouped[key].transactionCount++;
           

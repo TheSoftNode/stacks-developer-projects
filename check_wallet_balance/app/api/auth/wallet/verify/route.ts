@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWalletSignature } from '@/lib/wallet-auth';
-import { getChallenge, removeChallenge } from '../challenge/route';
+import { getChallenge, removeChallenge } from '@/lib/challenge-helpers';
 
 export async function POST(request: NextRequest) {
   try {

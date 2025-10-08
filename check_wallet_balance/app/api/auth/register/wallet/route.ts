@@ -3,7 +3,7 @@ import { User } from '@/models';
 import connectDB from '@/lib/db';
 import { verifyWalletSignature, generateDefaultUserData } from '@/lib/wallet-auth';
 import jwt from 'jsonwebtoken';
-import { getChallenge, removeChallenge } from '../../wallet/challenge/route';
+import { getChallenge, removeChallenge } from '@/lib/challenge-helpers';
 
 export async function POST(request: Request) {
   try {

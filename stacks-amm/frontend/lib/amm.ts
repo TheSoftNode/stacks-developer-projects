@@ -8,6 +8,7 @@ import {
   hexToCV,
   principalCV,
   PrincipalCV,
+  tupleCV,
   uintCV,
   UIntCV,
 } from "@stacks/transactions";
@@ -109,7 +110,7 @@ export async function getAllPools(): Promise<Pool[]> {
           contractName: AMM_CONTRACT_NAME,
           functionName: "get-pool-id",
           functionArgs: [
-            Cl.tuple({
+            tupleCV({
               "token-0": poolInitialData["token-0"],
               "token-1": poolInitialData["token-1"],
               fee: poolInitialData.fee,

@@ -35,13 +35,15 @@ import {
   ArrowDownRight,
   Wallet,
   Clock,
-  TrendingUp,
   Activity,
   Share2,
   AlertCircle,
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Code,
+  FileCode,
+  Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -58,7 +60,7 @@ interface WalletBalance {
 
 interface Transaction {
   txId: string;
-  type: 'sent' | 'received' | 'staking' | 'mining';
+  type: 'sent' | 'received' | 'contract_call' | 'contract_deployment' | 'mining' | 'microblock';
   amount: number;
   fee: number;
   fromAddress: string;
@@ -68,6 +70,17 @@ interface Transaction {
   status: 'pending' | 'confirmed' | 'failed';
   timestamp: string;
   memo: string;
+  nonce: number;
+  // Extended fields for contract interactions
+  contractId?: string;
+  functionName?: string;
+  functionArgs?: Array<{
+    name: string;
+    type: string;
+    repr: string;
+  }>;
+  sourceCode?: string;
+  clarityVersion?: number;
 }
 
 interface WalletData {
@@ -137,12 +150,13 @@ export default function WalletCheckerPage() {
   };
 
   const isValidStacksAddress = (address: string): boolean => {
-    return /^SP[0-9A-HJKMNP-TV-Z]{39}$|^SM[0-9A-HJKMNP-TV-Z]{39}$/.test(address);
+    // SP/SM = Mainnet, ST = Testnet
+    return /^(SP|SM|ST)[0-9A-HJKMNP-TV-Z]{39}$/.test(address);
   };
 
   const fetchWalletData = useCallback(async (address: string, page = 1) => {
     if (!isValidStacksAddress(address)) {
-      setError('Please enter a valid Stacks address (starts with SP or SM)');
+      setError('Please enter a valid Stacks address (starts with SP, SM, or ST)');
       return;
     }
 
@@ -152,7 +166,7 @@ export default function WalletCheckerPage() {
     try {
       const offset = (page - 1) * pagination.itemsPerPage;
       const response = await fetch(
-        `/api/public/wallet/${address}?limit=${pagination.itemsPerPage}&offset=${offset}`
+        `/api/public/wallet/${address}/full?limit=${pagination.itemsPerPage}&offset=${offset}`
       );
 
       if (!response.ok) {
@@ -301,7 +315,7 @@ export default function WalletCheckerPage() {
               Stacks Wallet <span className="text-brand-pink">Explorer</span>
             </h1>
             <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Enter any Stacks wallet address to view its balance, transaction history, and analytics in real-time.
+              Enter any Stacks wallet address to view its balance, transaction history, and analytics in real-time. Supports both mainnet (SP/SM) and testnet (ST) addresses.
             </p>
           </motion.div>
 
@@ -316,7 +330,7 @@ export default function WalletCheckerPage() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Search Wallet</CardTitle>
                 <CardDescription>
-                  Enter a Stacks address (starting with SP or SM) to explore
+                  Enter a Stacks address (mainnet: SP/SM, testnet: ST) to explore
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-0">
@@ -326,7 +340,7 @@ export default function WalletCheckerPage() {
                     <div className="flex space-x-2">
                       <Input
                         id="wallet-address"
-                        placeholder="SP1ABC123..."
+                        placeholder="SP1ABC... or ST1ABC..."
                         value={walletAddress}
                         onChange={(e) => setWalletAddress(e.target.value)}
                         className="flex-1"
@@ -593,6 +607,9 @@ export default function WalletCheckerPage() {
                               <SelectItem value="received">Received</SelectItem>
                               <SelectItem value="mining">Mining</SelectItem>
                               <SelectItem value="staking">Staking</SelectItem>
+                              <SelectItem value="contract_call">Contract Call</SelectItem>
+                              <SelectItem value="contract_deployment">Contract Deployment</SelectItem>
+                              <SelectItem value="microblock">Microblock</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -628,17 +645,47 @@ export default function WalletCheckerPage() {
                                             ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400'
                                             : tx.type === 'sent'
                                             ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'
+                                            : tx.type === 'contract_call'
+                                            ? 'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400'
+                                            : tx.type === 'contract_deployment'
+                                            ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400'
+                                            : tx.type === 'microblock'
+                                            ? 'bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400'
                                             : 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400'
                                         }`}>
                                           {tx.type === 'received' ? (
                                             <ArrowDownRight className="h-3 w-3" />
                                           ) : tx.type === 'sent' ? (
                                             <ArrowUpRight className="h-3 w-3" />
+                                          ) : tx.type === 'contract_call' ? (
+                                            <Code className="h-3 w-3" />
+                                          ) : tx.type === 'contract_deployment' ? (
+                                            <FileCode className="h-3 w-3" />
+                                          ) : tx.type === 'microblock' ? (
+                                            <Layers className="h-3 w-3" />
                                           ) : (
                                             <Activity className="h-3 w-3" />
                                           )}
                                         </div>
-                                        <span className="capitalize font-medium">{tx.type}</span>
+                                        <span className="capitalize font-medium">
+                                          {tx.type === 'contract_call' ? 'Contract Call' : 
+                                           tx.type === 'contract_deployment' ? 'Contract Deploy' :
+                                           tx.type === 'microblock' ? 'Microblock' :
+                                           tx.type}
+                                        </span>
+                                        {/* Show secondary label for contract calls with STX transfer */}
+                                        {tx.type === 'contract_call' && tx.amount !== 0 && (
+                                          <Badge 
+                                            variant="outline" 
+                                            className={`ml-2 text-xs ${
+                                              tx.amount > 0 
+                                                ? 'border-green-600 text-green-600 dark:border-green-400 dark:text-green-400'
+                                                : 'border-red-600 text-red-600 dark:border-red-400 dark:text-red-400'
+                                            }`}
+                                          >
+                                            {tx.amount > 0 ? 'Received' : 'Sent'}
+                                          </Badge>
+                                        )}
                                       </div>
                                     </TableCell>
                                     <TableCell>
@@ -657,29 +704,59 @@ export default function WalletCheckerPage() {
                                     </TableCell>
                                     <TableCell className="group">
                                       <div className="space-y-1">
-                                        <div className="text-sm">
-                                          <span className="text-muted-foreground">
-                                            {tx.type === 'received' ? 'From: ' : 'To: '}
-                                          </span>
-                                          <div className="inline-flex items-center space-x-2">
-                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                                              {formatAddress(
-                                                tx.type === 'received' ? tx.fromAddress : tx.toAddress
-                                              )}
-                                            </code>
-                                            <Button
-                                              variant="ghost"
-                                              size="icon"
-                                              className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
-                                              onClick={() => copyToClipboard(
-                                                tx.type === 'received' ? tx.fromAddress : tx.toAddress,
-                                                'Address'
-                                              )}
-                                            >
-                                              <Copy className="h-2.5 w-2.5" />
-                                            </Button>
+                                        {/* Contract transactions show contract details */}
+                                        {(tx.type === 'contract_call' || tx.type === 'contract_deployment') ? (
+                                          <>
+                                            {tx.contractId && (
+                                              <div className="text-sm">
+                                                <span className="text-muted-foreground">Contract: </span>
+                                                <div className="inline-flex items-center space-x-2">
+                                                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                                                    {formatAddress(tx.contractId)}
+                                                  </code>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                                                    onClick={() => copyToClipboard(tx.contractId!, 'Contract ID')}
+                                                  >
+                                                    <Copy className="h-2.5 w-2.5" />
+                                                  </Button>
+                                                </div>
+                                              </div>
+                                            )}
+                                            {tx.functionName && tx.type === 'contract_call' && (
+                                              <div className="text-xs text-muted-foreground">
+                                                Function: <code className="text-xs bg-muted px-1 py-0.5 rounded">{tx.functionName}</code>
+                                              </div>
+                                            )}
+                                          </>
+                                        ) : (
+                                          /* Regular transactions show from/to addresses */
+                                          <div className="text-sm">
+                                            <span className="text-muted-foreground">
+                                              {tx.type === 'received' ? 'From: ' : 'To: '}
+                                            </span>
+                                            <div className="inline-flex items-center space-x-2">
+                                              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                                                {formatAddress(
+                                                  tx.type === 'received' ? tx.fromAddress : tx.toAddress
+                                                )}
+                                              </code>
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                                                onClick={() => copyToClipboard(
+                                                  tx.type === 'received' ? tx.fromAddress : tx.toAddress,
+                                                  'Address'
+                                                )}
+                                              >
+                                                <Copy className="h-2.5 w-2.5" />
+                                              </Button>
+                                            </div>
                                           </div>
-                                        </div>
+                                        )}
                                         {tx.fee > 0 && (
                                           <div className="text-xs text-muted-foreground">
                                             Fee: {tx.fee.toFixed(6)} STX
@@ -703,6 +780,9 @@ export default function WalletCheckerPage() {
                                       </div>
                                       <div className="text-xs text-muted-foreground">
                                         Block {tx.blockHeight}
+                                      </div>
+                                      <div className="text-xs text-muted-foreground">
+                                        Nonce: {tx.nonce}
                                       </div>
                                     </TableCell>
                                     <TableCell>

@@ -48,12 +48,24 @@ interface TransactionResponse {
 }
 
 function isValidStacksAddress(address: string): boolean {
-  return /^SP[0-9A-HJKMNP-TV-Z]{39}$|^SM[0-9A-HJKMNP-TV-Z]{39}$/.test(address);
+  // SP/SM = Mainnet, ST = Testnet
+  return /^(SP|SM|ST)[0-9A-HJKMNP-TV-Z]{39}$/.test(address);
+}
+
+function isTestnetAddress(address: string): boolean {
+  return address.startsWith('ST');
+}
+
+function getApiBaseUrl(address: string): string {
+  return isTestnetAddress(address) 
+    ? 'https://api.testnet.hiro.so' 
+    : 'https://api.hiro.so';
 }
 
 async function fetchWalletBalance(address: string) {
   try {
-    const response = await fetch(`https://api.hiro.so/extended/v1/address/${address}/balances`);
+    const baseUrl = getApiBaseUrl(address);
+    const response = await fetch(`${baseUrl}/extended/v1/address/${address}/balances`);
     if (!response.ok) {
       throw new Error(`Failed to fetch balance: ${response.status}`);
     }
@@ -75,8 +87,9 @@ async function fetchWalletBalance(address: string) {
 
 async function fetchWalletTransactions(address: string, limit = 50, offset = 0) {
   try {
+    const baseUrl = getApiBaseUrl(address);
     const response = await fetch(
-      `https://api.hiro.so/extended/v1/address/${address}/transactions?limit=${limit}&offset=${offset}&unanchored=true`
+      `${baseUrl}/extended/v1/address/${address}/transactions?limit=${limit}&offset=${offset}&unanchored=true`
     );
     
     if (!response.ok) {
@@ -175,7 +188,7 @@ export async function GET(
     
     if (!isValidStacksAddress(address)) {
       return NextResponse.json(
-        { error: 'Invalid Stacks address format' },
+        { error: 'Invalid Stacks address format. Must start with SP, SM (mainnet), or ST (testnet)' },
         { status: 400 }
       );
     }

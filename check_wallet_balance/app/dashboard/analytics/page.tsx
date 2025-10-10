@@ -27,7 +27,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { 
+import {
   Loader2,
   ArrowUpRight,
   ArrowDownRight,
@@ -37,8 +37,19 @@ import {
   Wallet,
   ChevronDown,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Transaction {
   _id: string;
@@ -100,6 +111,9 @@ export default function AnalyticsPage() {
   const [groupBy, setGroupBy] = useState<'wallet' | 'date' | 'type'>('wallet');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [itemsPerPage] = useState(20);
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [walletToClear, setWalletToClear] = useState<{ id: string; address: string } | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -421,7 +435,7 @@ export default function AnalyticsPage() {
     try {
       const response = await fetch('/api/transactions', { method: 'POST' });
       const data = await response.json();
-      
+
       if (response.ok) {
         toast.success(`Synced ${data.totalSynced} new transactions`);
         fetchData();
@@ -432,6 +446,43 @@ export default function AnalyticsPage() {
       toast.error('Network error occurred');
     }
     setIsSyncing(false);
+  };
+
+  const handleClearTransactions = async () => {
+    if (!walletToClear) return;
+
+    setIsClearing(true);
+    try {
+      const response = await fetch('/api/transactions/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletId: walletToClear.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(`Cleared ${data.deletedCount} transactions for wallet`);
+        setClearDialogOpen(false);
+        setWalletToClear(null);
+        await fetchData(); // Refresh data
+      } else {
+        toast.error(data.error || 'Failed to clear transactions');
+      }
+    } catch (error) {
+      toast.error('Network error occurred');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const openClearDialog = (walletId: string, walletAddress: string) => {
+    setWalletToClear({ id: walletId, address: walletAddress });
+    setClearDialogOpen(true);
   };
 
   const getTransactionStats = () => {
@@ -746,12 +797,12 @@ export default function AnalyticsPage() {
             <div className="space-y-4">
               {Object.entries(groupedTransactions).map(([groupKey, group]) => (
                 <Card key={groupKey} className="border">
-                  <CardHeader 
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => toggleGroup(groupKey)}
-                  >
+                  <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
+                      <div
+                        className="flex items-center space-x-3 flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => toggleGroup(groupKey)}
+                      >
                         <Button
                           variant="ghost"
                           size="sm"
@@ -765,9 +816,9 @@ export default function AnalyticsPage() {
                         </Button>
                         <div>
                           <h3 className="font-semibold">
-                            {groupBy === 'wallet' 
+                            {groupBy === 'wallet'
                               ? (group.wallet.email || `${group.wallet.address.slice(0, 20)}...`)
-                              : groupBy === 'date' 
+                              : groupBy === 'date'
                               ? group.wallet.address
                               : `${group.wallet.address.charAt(0).toUpperCase()}${group.wallet.address.slice(1)} Transactions`
                             }
@@ -783,6 +834,20 @@ export default function AnalyticsPage() {
                           </p>
                         </div>
                       </div>
+                      {groupBy === 'wallet' && group.transactionCount > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openClearDialog(groupKey, group.wallet.address);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Clear Transactions
+                        </Button>
+                      )}
                       <div className="text-right">
                         <div className="flex flex-col space-y-1 text-sm">
                           <div className="flex space-x-4">
@@ -901,6 +966,41 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Clear Transactions Confirmation Dialog */}
+      <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear All Transactions?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all transactions for wallet:
+              <div className="mt-2 p-2 bg-muted rounded-md font-mono text-sm break-all">
+                {walletToClear?.address}
+              </div>
+              <div className="mt-3 text-red-600 font-semibold">
+                This action cannot be undone. You can always re-sync transactions from the blockchain later.
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isClearing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearTransactions}
+              disabled={isClearing}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isClearing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                'Clear Transactions'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

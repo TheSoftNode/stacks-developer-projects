@@ -114,6 +114,8 @@ export default function AnalyticsPage() {
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [walletToClear, setWalletToClear] = useState<{ id: string; address: string } | null>(null);
   const [isClearing, setIsClearing] = useState(false);
+  const [manualClearDialogOpen, setManualClearDialogOpen] = useState(false);
+  const [manualWalletAddress, setManualWalletAddress] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -485,6 +487,41 @@ export default function AnalyticsPage() {
     setClearDialogOpen(true);
   };
 
+  const handleManualClearTransactions = async () => {
+    if (!manualWalletAddress.trim()) {
+      toast.error('Please enter a wallet address');
+      return;
+    }
+
+    setIsClearing(true);
+    try {
+      const response = await fetch('/api/transactions/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: manualWalletAddress.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(`Cleared ${data.deletedCount} transactions for wallet`);
+        setManualClearDialogOpen(false);
+        setManualWalletAddress('');
+        await fetchData(); // Refresh data
+      } else {
+        toast.error(data.error || 'Failed to clear transactions');
+      }
+    } catch (error) {
+      toast.error('Network error occurred');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   const getTransactionStats = () => {
     const sent = transactions.filter(tx => tx.type === 'sent');
     const received = transactions.filter(tx => tx.type === 'received');
@@ -583,14 +620,24 @@ export default function AnalyticsPage() {
                 )}
               </div>
             </div>
-            <Button
-              onClick={syncTransactions}
-              disabled={isLoading}
-              className="gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Sync Transactions
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setManualClearDialogOpen(true)}
+                className="gap-2 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950"
+              >
+                <Trash2 className="h-4 w-4" />
+                Clear Wallet Transactions
+              </Button>
+              <Button
+                onClick={syncTransactions}
+                disabled={isLoading}
+                className="gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                Sync Transactions
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -987,6 +1034,96 @@ export default function AnalyticsPage() {
             <AlertDialogAction
               onClick={handleClearTransactions}
               disabled={isClearing}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isClearing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                'Clear Transactions'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Manual Clear Transactions Dialog */}
+      <AlertDialog open={manualClearDialogOpen} onOpenChange={setManualClearDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Wallet Transactions</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select a wallet from your list or enter a wallet address manually to clear all its transactions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4 space-y-4">
+            {/* Wallet Selector */}
+            {wallets.length > 0 && (
+              <div>
+                <Label htmlFor="wallet-selector">Select Your Wallet</Label>
+                <Select
+                  value={manualWalletAddress}
+                  onValueChange={setManualWalletAddress}
+                  disabled={isClearing}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Choose a wallet or enter manually below" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {wallets.map((wallet) => (
+                      <SelectItem key={wallet._id} value={wallet.address}>
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-mono text-sm">
+                            {wallet.address.slice(0, 10)}...{wallet.address.slice(-8)}
+                          </span>
+                          {wallet.email && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              ({wallet.email})
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Manual Input */}
+            <div>
+              <Label htmlFor="manual-wallet-address">Or Enter Wallet Address Manually</Label>
+              <Input
+                id="manual-wallet-address"
+                placeholder="Enter Stacks wallet address (SP...)"
+                value={manualWalletAddress}
+                onChange={(e) => setManualWalletAddress(e.target.value)}
+                className="mt-2"
+                disabled={isClearing}
+              />
+            </div>
+
+            {manualWalletAddress && (
+              <div className="mt-3 p-3 bg-muted rounded-lg">
+                <p className="text-sm font-semibold mb-2">Selected Wallet:</p>
+                <p className="font-mono text-sm break-all mb-3">{manualWalletAddress}</p>
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-semibold mb-1">Note:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Only wallets you own can be cleared</li>
+                    <li>This will delete all transaction history for this wallet</li>
+                    <li>You can re-sync transactions from blockchain later</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isClearing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleManualClearTransactions}
+              disabled={isClearing || !manualWalletAddress.trim()}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               {isClearing ? (

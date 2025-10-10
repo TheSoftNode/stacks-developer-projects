@@ -522,6 +522,34 @@ export default function AnalyticsPage() {
     }
   };
 
+  const handleCleanupOrphanedTransactions = async () => {
+    try {
+      setIsLoading(true);
+      toast.info('Cleaning up orphaned transactions...');
+
+      const response = await fetch('/api/transactions/cleanup', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.deletedCount > 0) {
+          toast.success(`Cleaned up ${data.deletedCount} orphaned transactions`);
+          await fetchData(); // Refresh data
+        } else {
+          toast.success('No orphaned transactions found');
+        }
+      } else {
+        toast.error(data.error || 'Failed to cleanup transactions');
+      }
+    } catch (error) {
+      toast.error('Network error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getTransactionStats = () => {
     const sent = transactions.filter(tx => tx.type === 'sent');
     const received = transactions.filter(tx => tx.type === 'received');
@@ -818,7 +846,7 @@ export default function AnalyticsPage() {
               
               <div className="space-y-2">
                 <Label>Actions</Label>
-                <div className="flex space-x-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -835,6 +863,20 @@ export default function AnalyticsPage() {
                     onClick={() => setExpandedGroups(new Set())}
                   >
                     Collapse All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCleanupOrphanedTransactions}
+                    disabled={isLoading}
+                    className="text-orange-600 border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950"
+                    title="Remove transactions from deleted wallets"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Cleanup'
+                    )}
                   </Button>
                 </div>
               </div>

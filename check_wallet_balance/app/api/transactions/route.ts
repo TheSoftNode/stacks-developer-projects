@@ -139,8 +139,19 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Build query
-    const query: any = { userId: payload.userId };
+    // First, get all active wallets for this user
+    const activeWallets = await Wallet.find({
+      userId: payload.userId,
+      isActive: true
+    }).select('_id');
+
+    const activeWalletIds = activeWallets.map(w => w._id.toString());
+
+    // Build query - only include transactions from active wallets
+    const query: any = {
+      userId: payload.userId,
+      walletId: { $in: activeWalletIds }
+    };
     if (walletId) query.walletId = walletId;
     if (type && type !== 'all') query.type = type;
 
